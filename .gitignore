@@ -1,0 +1,11 @@
+node_modules/
+test-results/
+playwright-report/
+blob-report/
+*.tmp.mjs
+.DS_Store
+*.log
+# Release signing material never goes into git
+*.jks
+*.keystore
+keystore.properties

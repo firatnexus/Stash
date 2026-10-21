@@ -1,0 +1,17 @@
+{
+  "appId": "io.github.firatnexus.reelsorganizer",
+  "appName": "Reels Organizer",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": true
+  },
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": false
+    }
+  }
+}

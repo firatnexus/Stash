@@ -1,0 +1,32 @@
+{
+  "name": "reels-organizer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local-first Android app to organize saved Instagram Reels into your own categories.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "vendor": "node scripts/vendor.mjs",
+    "serve": "node scripts/serve.mjs",
+    "test": "node --test tests/unit/",
+    "test:e2e": "playwright test",
+    "check:i18n": "node --test tests/unit/i18n.test.mjs",
+    "icons": "node scripts/make_icons.mjs",
+    "sync": "node scripts/vendor.mjs && cap sync android",
+    "apk:debug": "npm run sync && cd android && ./gradlew assembleDebug",
+    "apk:release": "npm run sync && cd android && ./gradlew assembleRelease"
+  },
+  "dependencies": {
+    "@capacitor/android": "7.6.9",
+    "@capacitor/app": "7.1.2",
+    "@capacitor/core": "7.6.9"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "7.6.9",
+    "@playwright/test": "1.59.1",
+    "fake-indexeddb": "6.2.6"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
