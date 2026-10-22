@@ -240,6 +240,29 @@ export function reelDetailSheet(reelId) {
 
         // Preview area
         const preview = h('div', { class: 'detail-preview' }, reelTile(r, cat, 'lg'));
+        if (!r.thumbnailPath) {
+          const refreshBtn = h(
+            'button',
+            {
+              class: 'btn btn-ghost btn-sm preview-btn',
+              type: 'button',
+              'data-testid': 'refresh-cover',
+              onclick: async (e) => {
+                const b = e.currentTarget;
+                b.disabled = true;
+                b.classList.add('loading');
+                const res = await store.refreshReelMeta(r.id).catch(() => ({ ok: false }));
+                b.disabled = false;
+                b.classList.remove('loading');
+                if (res.ok) toast(t('coverRefreshOk'), { tone: 'success' });
+                else toast(t('coverRefreshFailed'), { tone: 'warn', duration: 5000 });
+              },
+            },
+            icon('download', 16),
+            t('coverRefresh'),
+          );
+          preview.append(refreshBtn);
+        }
         const emb = embedUrl(r);
         if (emb) {
           const loadBtn = h(
@@ -261,13 +284,14 @@ export function reelDetailSheet(reelId) {
 
         // Meta
         const pUrl = profileUrl(r.username);
+        const avatar = r.avatarUrl ? h('img', { class: 'avatar', src: r.avatarUrl, alt: '', loading: 'lazy', referrerpolicy: 'no-referrer' }) : null;
         const meta = h(
           'div',
           { class: 'detail-meta' },
           h(
             'div',
             { class: 'detail-creator' },
-            icon('user', 16),
+            avatar || icon('user', 16),
             r.username
               ? h('button', { class: 'linkish', type: 'button', onclick: () => pUrl && openExternal(pUrl) }, '@' + r.username)
               : h('span', { class: 'faint' }, r.creatorName || t('unknownCreator')),

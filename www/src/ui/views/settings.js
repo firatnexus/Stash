@@ -1,7 +1,7 @@
 import { h, icon, toast, confirmSheet, sheet } from '../dom.js';
 import { t, setLang, lang } from '../../core/i18n.js';
 import * as store from '../../core/store.js';
-import { saveTextFile, httpPost, isNative } from '../../core/platform.js';
+import { saveTextFile, httpPost, isNative, cacheStats, clearCache } from '../../core/platform.js';
 import { AI_PRESETS, aiClassify } from '../../categorize/ai.js';
 import { backupFileName, validateBackup } from '../../io/backup.js';
 import { APP_VERSION } from '../../version.js';
@@ -47,6 +47,7 @@ export function renderSettings() {
   );
 
   root.append(aiSection());
+  root.append(coversSection());
   root.append(dataSection());
 
   // About
@@ -136,6 +137,75 @@ function aiSection() {
     h('h2', { class: 'section-title' }, icon('sparkles', 18), t('aiTitle')),
     row(t('aiEnable'), toggle(ai.enabled, (v) => { ai.enabled = v; fields.hidden = !v; save(); }, 'ai-enable', t('aiEnable')), t('aiEnableHint')),
     fields,
+  );
+}
+
+function fmtBytes(n) {
+  if (!n || n < 1024) return `${n || 0} KB`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function coversSection() {
+  const usage = h('p', { class: 'hint', 'data-testid': 'cache-usage' }, t('cacheUsage', { size: '—' }));
+  const refreshUsage = async () => {
+    usage.textContent = t('cacheUsage', { size: fmtBytes(await cacheStats()) });
+  };
+  refreshUsage();
+
+  const backfill = h(
+    'button',
+    {
+      class: 'btn btn-secondary',
+      type: 'button',
+      'data-testid': 'backfill-covers',
+      onclick: async (e) => {
+        const b = e.currentTarget;
+        b.disabled = true;
+        b.classList.add('loading');
+        try {
+          const r = await store.refreshAllReels();
+          if (!r.total) toast(t('backfillNone'));
+          else toast(t('backfillDone', { n: r.total, ok: r.ok }), { tone: r.fail ? 'warn' : 'success', duration: 6000 });
+        } finally {
+          b.disabled = false;
+          b.classList.remove('loading');
+          refreshUsage();
+        }
+      },
+    },
+    icon('sparkles', 16),
+    t('backfillBtn'),
+  );
+
+  const clearBtn = h(
+    'button',
+    {
+      class: 'btn btn-ghost btn-danger-text',
+      type: 'button',
+      'data-testid': 'clear-cache',
+      onclick: async () => {
+        const ok = await clearCache();
+        if (ok) {
+          await store.load();
+          toast(t('cacheCleared'));
+        } else {
+          toast(t('cacheClearFailed'), { tone: 'warn' });
+        }
+        refreshUsage();
+      },
+    },
+    icon('trash', 16),
+    t('clearCache'),
+  );
+
+  return h(
+    'section',
+    { class: 'panel', 'data-testid': 'covers-section' },
+    h('h2', { class: 'section-title' }, icon('grid', 18), t('coversTitle')),
+    h('p', { class: 'muted' }, t('coversText')),
+    h('div', { class: 'row wrap' }, backfill, clearBtn),
+    usage,
   );
 }
 

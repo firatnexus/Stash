@@ -151,6 +151,66 @@ export async function httpPost(url, headers, body) {
   }
 }
 
+/* --------------------- Covers (native only) ------------------------- */
+
+/** Fetch Instagram's public embed page HTML (native only; null in a browser). */
+export async function fetchEmbedPage(url) {
+  const b = bridge();
+  if (!b) return null;
+  try {
+    const r = await b.fetchEmbedPage({ url });
+    if (!r || r.status < 200 || r.status >= 300) return null;
+    return r.body || '';
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Download an image, downscale it and store it as WebP in app storage.
+ * @returns {Promise<{path:string, bytes:number}|null>}
+ */
+export async function downloadImage(url, name, maxWidth = 480) {
+  const b = bridge();
+  if (!b) return null;
+  try {
+    const r = await b.downloadImage({ url, name, maxWidth });
+    return r && r.path ? { path: r.path, bytes: r.bytes || 0 } : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Total size of the stored cover/avatar cache (bytes; 0 in a browser). */
+export async function cacheStats() {
+  const b = bridge();
+  if (!b) return 0;
+  try {
+    const r = await b.cacheStats();
+    return (r && r.bytes) || 0;
+  } catch {
+    return 0;
+  }
+}
+
+/** Delete stored cover/avatar images. The reels themselves are kept. */
+export async function clearCache() {
+  const b = bridge();
+  if (!b) return false;
+  try {
+    await b.clearCache();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Convert an app-internal file path to a URL the WebView can display. */
+export function convertFileSrc(path) {
+  const c = cap();
+  return c && typeof c.convertFileSrc === 'function' ? c.convertFileSrc(path) : null;
+}
+
 /* ----------------------------- System bars ------------------------- */
 
 /** Match Android status/navigation bar colors to the app theme. */

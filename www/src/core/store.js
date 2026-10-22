@@ -6,8 +6,9 @@ import * as repo from '../storage/repo.js';
 import { classify, classifyLocal } from '../categorize/engine.js';
 import { buildCreatorStats } from '../categorize/creator.js';
 import { STARTERS } from '../categorize/starters.js';
-import { parseUserInput, parseSharePayload } from '../instagram/url.js';
-import { httpPost } from './platform.js';
+import { parseUserInput, parseSharePayload, embedUrl } from '../instagram/url.js';
+import { parseEmbedHtml } from '../instagram/embed.js';
+import { httpPost, fetchEmbedPage, downloadImage, convertFileSrc } from './platform.js';
 import { buildBackup, validateBackup, planMerge } from '../io/backup.js';
 import { APP_VERSION } from '../version.js';
 
@@ -160,10 +161,64 @@ export async function addFromText({ text, caption = '', title = '', notes = '', 
     else {
       state.reels.push(r.reel);
       out.added.push(r.reel);
+      refreshReelMeta(r.reel.id).catch(() => {}); // cover + creator info, in background
     }
   }
   if (out.added.length) emit('reels');
   return out;
+}
+
+/**
+ * Fetch the public embed page for a reel and store cover, avatar, username
+ * and caption locally. Only still-empty fields are filled — nothing the user
+ * wrote is overwritten. Native only; a no-op in a browser.
+ * @returns {Promise<{ok:boolean, reason?:string}>}
+ */
+export async function refreshReelMeta(id) {
+  const reel = state.reels.find((r) => r.id === id);
+  if (!reel || reel.kind === 'share') return { ok: false, reason: 'unsupported' };
+  const page = embedUrl(reel);
+  if (!page) return { ok: false, reason: 'unsupported' };
+  const html = await fetchEmbedPage(page);
+  const info = parseEmbedHtml(html);
+  if (!info) return { ok: false, reason: 'fetch_failed' };
+  const patch = {};
+  if (info.username && !reel.username) patch.username = info.username;
+  if (info.caption && !reel.caption) patch.caption = info.caption.slice(0, 5000);
+  if (info.coverUrl) {
+    const img = await downloadImage(info.coverUrl, `cover-${reel.key}.webp`, 480);
+    if (img) {
+      patch.thumbnailPath = img.path;
+      const src = convertFileSrc(img.path);
+      if (src) patch.thumbnailUrl = src;
+    }
+  }
+  if (info.avatarUrl && info.username) {
+    const av = await downloadImage(info.avatarUrl, `avatar-${info.username}.webp`, 144);
+    if (av) {
+      patch.avatarPath = av.path;
+      const src = convertFileSrc(av.path);
+      if (src) patch.avatarUrl = src;
+    }
+  }
+  if (Object.keys(patch).length) await updateReel(id, patch);
+  return { ok: true };
+}
+
+/**
+ * Backfill covers/creator info for reels that do not have them yet.
+ * @returns {Promise<{total:number, ok:number, fail:number}>}
+ */
+export async function refreshAllReels() {
+  const targets = state.reels.filter((r) => !r.thumbnailPath && r.kind !== 'share');
+  let ok = 0;
+  let fail = 0;
+  for (const r of targets) {
+    const res = await refreshReelMeta(r.id).catch(() => ({ ok: false }));
+    if (res.ok) ok++;
+    else fail++;
+  }
+  return { total: targets.length, ok, fail };
 }
 
 /** Handle a Share-to-app payload. */

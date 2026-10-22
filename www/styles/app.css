@@ -492,6 +492,7 @@ dialog.sheet.closing::backdrop { opacity: 0; transition: opacity 0.18s; }
 .detail-actions { display: flex; flex-direction: column; gap: var(--space-2); }
 .detail-actions .btn { width: 100%; }
 .detail-creator { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-base); }
+.avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: var(--surface-2); }
 .detail-meta { display: flex; flex-direction: column; gap: var(--space-3); }
 .facts { display: grid; grid-template-columns: auto 1fr; gap: var(--space-1) var(--space-4); margin: 0; font-size: var(--text-sm); }
 .facts dt { color: var(--muted); }

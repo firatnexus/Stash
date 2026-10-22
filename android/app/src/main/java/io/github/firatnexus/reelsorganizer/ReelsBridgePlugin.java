@@ -6,6 +6,8 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -23,8 +25,16 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Small native bridge for Sakla (Reels Organizer).
@@ -33,12 +43,17 @@ import java.nio.charset.StandardCharsets;
  * - Opens links with ACTION_VIEW so instagram.com links go to the Instagram app.
  * - Saves backup files through the system "Save as" dialog (Storage Access Framework).
  * - Reads the clipboard and colors the system bars.
+ * - Fetches Instagram's public embed page and stores compressed cover/avatar
+ *   images locally (the same public data the in-app preview already uses).
  *
- * It never reads Instagram data, cookies or accounts.
+ * It never reads Instagram cookies, sessions or accounts.
  */
 @CapacitorPlugin(name = "ReelsBridge")
 public class ReelsBridgePlugin extends Plugin {
 
+    private static final String UA =
+            "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Mobile Safari/537.36";
+    private final ExecutorService io = Executors.newSingleThreadExecutor();
     private static JSObject pendingShare;
     private static ReelsBridgePlugin instance;
     private String pendingSaveText;
@@ -192,6 +207,174 @@ public class ReelsBridgePlugin extends Plugin {
             c.setAppearanceLightNavigationBars(!dark);
             decor.setBackgroundColor(bg);
         });
+        call.resolve();
+    }
+
+    /* ---------------------- Covers / embed metadata --------------------- */
+
+    /** Only instagram.com embed pages may be fetched (no arbitrary URLs). */
+    private static boolean isAllowedEmbedUrl(String url) {
+        if (url == null) return false;
+        Uri u;
+        try {
+            u = Uri.parse(url);
+        } catch (Exception e) {
+            return false;
+        }
+        if (!"https".equals(u.getScheme())) return false;
+        String host = u.getHost() == null ? "" : u.getHost().toLowerCase();
+        if (!host.equals("instagram.com") && !host.equals("www.instagram.com")) return false;
+        String path = u.getPath() == null ? "" : u.getPath();
+        return path.contains("/embed");
+    }
+
+    /** Cover/avatar images only come from Instagram/Facebook CDNs. */
+    private static boolean isAllowedImageHost(String url) {
+        if (url == null) return false;
+        Uri u;
+        try {
+            u = Uri.parse(url);
+        } catch (Exception e) {
+            return false;
+        }
+        if (!"https".equals(u.getScheme())) return false;
+        String host = u.getHost() == null ? "" : u.getHost().toLowerCase();
+        return host.endsWith(".cdninstagram.com") || host.endsWith(".fbcdn.net");
+    }
+
+    private static class HttpText {
+        final int status;
+        final String body;
+        HttpText(int status, String body) { this.status = status; this.body = body; }
+    }
+
+    private static HttpText httpGetText(String url) throws Exception {
+        HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
+        c.setConnectTimeout(15000);
+        c.setReadTimeout(20000);
+        c.setRequestProperty("User-Agent", UA);
+        c.setInstanceFollowRedirects(true);
+        try {
+            int status = c.getResponseCode();
+            InputStream in = status >= 400 ? c.getErrorStream() : c.getInputStream();
+            ByteArrayOutputStream buf = new ByteArrayOutputStream();
+            if (in != null) {
+                byte[] b = new byte[8192];
+                int n;
+                while ((n = in.read(b)) > 0) buf.write(b, 0, n);
+                in.close();
+            }
+            return new HttpText(status, buf.toString("UTF-8"));
+        } finally {
+            c.disconnect();
+        }
+    }
+
+    /**
+     * Fetch the public Instagram embed page (same page the in-app preview
+     * iframe uses) so the web layer can read cover/creator/caption from it.
+     */
+    @PluginMethod
+    public void fetchEmbedPage(PluginCall call) {
+        String url = call.getString("url");
+        if (!isAllowedEmbedUrl(url)) {
+            call.reject("invalid_url");
+            return;
+        }
+        io.execute(() -> {
+            try {
+                HttpText r = httpGetText(url);
+                JSObject o = new JSObject();
+                o.put("status", r.status);
+                o.put("body", r.body);
+                call.resolve(o);
+            } catch (Exception e) {
+                call.reject("network_error", e);
+            }
+        });
+    }
+
+    private File coversDir() {
+        File dir = new File(getContext().getFilesDir(), "covers");
+        if (!dir.exists()) dir.mkdir();
+        return dir;
+    }
+
+    /** Download an image, downscale it to maxWidth and store it as WebP. */
+    @PluginMethod
+    public void downloadImage(PluginCall call) {
+        String url = call.getString("url");
+        String name = call.getString("name");
+        int maxWidth = call.getInt("maxWidth", 480) == null ? 480 : call.getInt("maxWidth", 480);
+        if (!isAllowedImageHost(url) || name == null || !name.matches("[A-Za-z0-9._-]+")) {
+            call.reject("invalid_url");
+            return;
+        }
+        io.execute(() -> {
+            try {
+                HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
+                c.setConnectTimeout(15000);
+                c.setReadTimeout(25000);
+                c.setRequestProperty("User-Agent", UA);
+                Bitmap bmp;
+                try (InputStream in = c.getInputStream()) {
+                    BitmapFactory.Options bounds = new BitmapFactory.Options();
+                    bounds.inJustDecodeBounds = true;
+                    // read the stream fully once; decode from the bytes
+                    ByteArrayOutputStream buf = new ByteArrayOutputStream();
+                    byte[] b = new byte[8192];
+                    int n;
+                    while (in != null && (n = in.read(b)) > 0) buf.write(b, 0, n);
+                    byte[] data = buf.toByteArray();
+                    BitmapFactory.decodeByteArray(data, 0, data.length, bounds);
+                    int sample = 1;
+                    while (bounds.outWidth / (sample * 2) >= maxWidth) sample *= 2;
+                    BitmapFactory.Options opts = new BitmapFactory.Options();
+                    opts.inSampleSize = sample;
+                    bmp = BitmapFactory.decodeByteArray(data, 0, data.length, opts);
+                } finally {
+                    c.disconnect();
+                }
+                if (bmp == null) throw new IllegalStateException("decode_failed");
+                if (bmp.getWidth() > maxWidth) {
+                    float scale = (float) maxWidth / bmp.getWidth();
+                    bmp = Bitmap.createScaledBitmap(bmp, maxWidth, Math.round(bmp.getHeight() * scale), true);
+                }
+                File out = new File(coversDir(), name);
+                try (FileOutputStream fos = new FileOutputStream(out)) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        bmp.compress(Bitmap.CompressFormat.WEBP_LOSSY, 82, fos);
+                    } else {
+                        bmp.compress(Bitmap.CompressFormat.WEBP, 82, fos);
+                    }
+                }
+                bmp.recycle();
+                JSObject o = new JSObject();
+                o.put("path", out.getAbsolutePath());
+                o.put("bytes", out.length());
+                call.resolve(o);
+            } catch (Exception e) {
+                call.reject("download_failed", e);
+            }
+        });
+    }
+
+    /** Total size of the stored cover/avatar cache. */
+    @PluginMethod
+    public void cacheStats(PluginCall call) {
+        long bytes = 0;
+        File[] files = coversDir().listFiles();
+        if (files != null) for (File f : files) if (f.isFile()) bytes += f.length();
+        JSObject o = new JSObject();
+        o.put("bytes", bytes);
+        call.resolve(o);
+    }
+
+    /** Delete stored cover/avatar images (reels themselves are kept). */
+    @PluginMethod
+    public void clearCache(PluginCall call) {
+        File[] files = coversDir().listFiles();
+        if (files != null) for (File f : files) if (f.isFile()) f.delete();
         call.resolve();
     }
 }
