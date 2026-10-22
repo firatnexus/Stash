@@ -59,16 +59,16 @@ jobs:
           VERSION=$(sed -n "s/.*APP_VERSION = '\(.*\)'.*/\1/p" www/src/version.js)
           mkdir -p dist
           if [ "$HAS_KEYSTORE" = "true" ]; then
-            cp android/app/build/outputs/apk/release/app-release.apk "dist/reels-organizer-$VERSION.apk"
+            cp android/app/build/outputs/apk/release/app-release.apk "dist/stash-$VERSION.apk"
           else
-            cp android/app/build/outputs/apk/debug/app-debug.apk "dist/reels-organizer-$VERSION-debug.apk"
+            cp android/app/build/outputs/apk/debug/app-debug.apk "dist/stash-$VERSION-debug.apk"
           fi
           (cd dist && sha256sum *.apk > SHA256SUMS.txt)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: reels-organizer-apk
+          name: stash-apk
           path: dist/
 
       - name: Attach to GitHub release
@@ -76,5 +76,5 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || gh release create "$GITHUB_REF_NAME" --title "Reels Organizer $GITHUB_REF_NAME" --notes "See CHANGELOG.md"
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || gh release create "$GITHUB_REF_NAME" --title "Stash $GITHUB_REF_NAME" --notes "See CHANGELOG.md"
           gh release upload "$GITHUB_REF_NAME" dist/* --clobber
