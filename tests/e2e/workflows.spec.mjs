@@ -213,6 +213,34 @@ test('8 · share a Reel link into the app', async ({ page }) => {
   await expect(page.getByTestId('reel-card')).toHaveCount(2);
 });
 
+test('9 · sheet drag-to-dismiss', async ({ page }) => {
+  test.skip((page.viewportSize() ?? { width: 0 }).width >= 720, 'drag-to-dismiss is phone-width only');
+  await page.goto('/');
+  await page.waitForFunction(() => globalThis.__reels && globalThis.__reels.store.state.ready);
+  await page.evaluate(() => {
+    globalThis.__reels.store.createCategory({ name: 'Funny', keywords: ['lol'] });
+    globalThis.__reels.handleShare({ text: 'https://www.instagram.com/reel/DRAG12345/' });
+  });
+  const sheet = page.getByTestId('pick-category-sheet');
+  await expect(sheet).toBeVisible();
+  // a short drag springs back and keeps the sheet open
+  const grip = sheet.locator('.sheet-grip');
+  let box = await grip.boundingBox();
+  await page.mouse.move(box.x + 20, box.y + 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x + 20, box.y + 42, { steps: 8 });
+  await page.mouse.up();
+  await expect(sheet).toBeVisible();
+  await expect(sheet).toHaveCSS('transform', 'none'); // spring back settles
+  // a long downward drag dismisses it
+  box = await grip.boundingBox();
+  await page.mouse.move(box.x + 20, box.y + 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x + 20, box.y + 420, { steps: 12 });
+  await page.mouse.up();
+  await expect(sheet).toBeHidden({ timeout: 2000 });
+});
+
 test('Instagram data export import (ZIP)', async ({ page }) => {
   await ready(page);
   const { makeZip } = await import('../unit/helpers/zip-writer.mjs');

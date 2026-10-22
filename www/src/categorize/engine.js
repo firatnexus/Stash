@@ -75,9 +75,8 @@ export async function classify(reel, categories, { creatorStats, ai, post } = {}
       const others = local.candidates.filter((c) => !r.categoryIds.includes(c.id));
       const candidates = [...aiCand, ...others].slice(0, 4);
       const extra = { aiTags: r.tags, aiNewCategory: r.newCategory, aiConfidence: r.confidence };
-      if (r.categoryIds.length && r.confidence >= 0.6) {
-        return { ...local, status: 'confident', categoryId: r.categoryIds[0], method: 'ai', candidates, ...extra };
-      }
+      // AI results are never auto-applied: even a high-confidence category is
+      // only a suggestion — the pick sheet always asks the user to confirm.
       return { ...local, candidates, ...extra };
     }
     return local;

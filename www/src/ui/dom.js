@@ -128,7 +128,8 @@ export function sheet({ title, content, onClose, testid = 'sheet', size = 'md' }
     closed = true;
     const i = openSheets.indexOf(api);
     if (i >= 0) openSheets.splice(i, 1);
-    dlg.classList.add('closing');
+    // dragged-out sheets already sit partway down; only animate the rest
+    if (!dlg.style.transform) dlg.classList.add('closing');
     setTimeout(() => {
       try {
         dlg.close();
@@ -170,6 +171,11 @@ export function sheet({ title, content, onClose, testid = 'sheet', size = 'md' }
     lastT = performance.now();
     vel = 0;
     dlg.classList.add('dragging');
+    try {
+      e.currentTarget.setPointerCapture && e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      /* capture is best-effort */
+    }
   };
   const onMove = (e) => {
     if (!dragging) return;
@@ -187,18 +193,29 @@ export function sheet({ title, content, onClose, testid = 'sheet', size = 'md' }
     const dy = lastY - dragY0;
     const h = dlg.offsetHeight || 1;
     if (dy > h * 0.3 || (vel > 0.5 && dy > 40)) {
-      dlg.style.transform = '';
-      close();
+      // dismissed: slide out from the dragged position (no snap back to base)
+      dlg.style.transition = 'transform 0.18s cubic-bezier(0.32, 0.72, 0, 1)';
+      dlg.style.transform = `translateY(${h + 60}px)`;
+      setTimeout(() => {
+        dlg.style.transition = '';
+        close();
+      }, 190);
     } else {
       dlg.style.transform = ''; // springs back via the base transition
     }
+  };
+  const onCancel = () => {
+    if (!dragging) return;
+    dragging = false;
+    dlg.classList.remove('dragging');
+    dlg.style.transform = ''; // system cancelled the drag: just spring back, never close
   };
   for (const el of [grip, head]) {
     el.addEventListener('pointerdown', onDown);
   }
   dlg.addEventListener('pointermove', onMove);
   dlg.addEventListener('pointerup', onUp);
-  dlg.addEventListener('pointercancel', onUp);
+  dlg.addEventListener('pointercancel', onCancel);
   return api;
 }
 

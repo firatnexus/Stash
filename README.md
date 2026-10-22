@@ -16,6 +16,8 @@
 
 <img src="docs/screenshots/light-home.png" width="236" alt="Ana sayfa" /><img src="docs/screenshots/light-library.png" width="236" alt="Kitaplık" /><img src="docs/screenshots/light-pick.png" width="236" alt="Kategori seçimi ve etiket önerileri" /><img src="docs/screenshots/dark-detail.png" width="236" alt="Ayrıntı sayfası, karanlık tema" />
 
+*Ekran görüntüleri örnek verilerle alınmıştır; kapaklardaki gradyanlar yer tutucudur (gerçek kapakler cihazda Instagram'dan indirilir).*
+
 </div>
 
 ---
@@ -81,7 +83,7 @@ Bağlantı yapıştır / toplu ekle / dışa aktarım dosyası ─────�
 
 En iyi puan **≥ 1** ve ikincinin **en az 2 katı** ise Reel otomatik eklenir. Değilse "Kategori bekleyenler"e düşer ve önerilerle birlikte seçmen istenir. Metin yoksa (örneğin sadece bağlantı paylaşıldıysa) uygulama açıklama uydurmaz; seçimi sana bırakır ya da açıklamayı yapıştırmanı önerir.
 
-Yapay zekâ açıksa: yalnızca yerel sonuç *emin değilse* ve Reel'in gerçek bir metni varsa çağrılır. Model en fazla 3 mevcut kategori ve en fazla 1 yeni kategori önerir; güven ≥ 0.6 ise otomatik eklenir, altındaysa sadece öneri olur. Ayrıca 3-5 etiket önerir — bunlar asla otomatik uygulanmaz, dokunarak onaylanır ("Hepsini reddet" ile tümü reddedilir). Ayarlar'da ne gönderildiği yazar (yalnızca Reel metni ve kategori adları) ve öneriler tamamen kapatılabilir.
+Yapay zekâ açıksa: yalnızca yerel sonuç *emin değilse* ve Reel'in gerçek bir metni varsa çağrılır. Model en fazla 3 mevcut kategori ve en fazla 1 yeni kategori önerir — **hiçbir AI sonucu otomatik uygulanmaz**, güveni yüksek olsa bile kategori seçim sayfası sana sorar. Ayrıca 3-5 etiket önerir — bunlar da asla otomatik uygulanmaz, dokunarak onaylanır ("Hepsini reddet" ile tümü reddedilir). Ayarlar'da ne gönderildiği yazar (yalnızca Reel metni ve kategori adları) ve öneriler tamamen kapatılabilir.
 
 ## Instagram ile ne çalışır, ne çalışmaz?
 
@@ -110,7 +112,7 @@ Bu uygulama Instagram'a **giriş yapmaz**, şifre veya çerez istemez, sayfalar�
 
 - Tüm veriler cihazdaki IndexedDB'de durur. Uygulamanın sunucusu yok.
 - Android otomatik bulut yedeği ve cihazdan cihaza aktarım kapalıdır (`allowBackup=false`, `data_extraction_rules.xml`). Taşımak için uygulama içi JSON yedeğini kullan.
-- Ağ yalnızca şu durumlarda kullanılır: Reel'i Instagram'da açtığında, gömülü önizlemeyi kendin yüklediğinde (Instagram'a bağlanır) ve yapay zekâyı açtıysan (Reel metni + kategori adları seçtiğin sağlayıcıya gider).
+- Ağ yalnızca şu durumlarda kullanılır: kayıt sırasında Instagram'ın herkese açık embed sayfasından kapak/paylaşan bilgisi çekilirken (yalnızca instagram.com/reel/…/embed adresine), Reel'i Instagram'da açtığında, gömülü önizlemeyi kendin yüklediğinde (Instagram'a bağlanır) ve yapay zekâyı açtıysan (Reel metni + kategori adları seçtiğin sağlayıcıya gider).
 - Yapay zekâ API anahtarı yalnızca cihazda saklanır ve yedeklere **asla** yazılmaz.
 
 ## Geliştirme

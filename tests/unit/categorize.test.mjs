@@ -101,9 +101,12 @@ test('AI provider is only called when local result is unsure, and requests are w
   assert.equal(calls[0].url, 'https://api.example.com/v1/chat/completions');
   assert.equal(calls[0].headers.authorization, 'Bearer sk-test');
   assert.match(calls[0].body.messages[0].content, /1 to 3/);
-  assert.equal(r.status, 'confident');
-  assert.equal(r.categoryId, 'funny');
-  assert.equal(r.method, 'ai');
+  // AI results are never auto-applied, even at high confidence: the pick
+  // sheet always asks the user (item 5 rule).
+  assert.notEqual(r.status, 'confident');
+  assert.equal(r.categoryId, null);
+  assert.equal(r.method, null);
+  assert.equal(r.candidates[0].id, 'funny');
   assert.deepEqual(r.aiTags, ['cat', 'funny']); // suggestions only, never auto-applied
 });
 

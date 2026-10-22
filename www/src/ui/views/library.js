@@ -104,7 +104,7 @@ export function renderLibrary(query) {
             },
           },
           h('span', { class: 'chip-n', style: 'background:var(--surface-3)' }, '#'),
-          d.label,
+          d.name,
           h('span', { class: 'chip-n' }, String(d.n)),
         ),
       ),
