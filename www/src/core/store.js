@@ -55,9 +55,9 @@ export function reviewQueue() {
 
 /**
  * Search + filter + sort.
- * @param {{q?:string, cat?:string|'none'|'review'|null, sort?:'new'|'old'}} f
+ * @param {{q?:string, cat?:string|'none'|'review'|null, tag?:string|null, sort?:'new'|'old'}} f
  */
-export function queryReels({ q = '', cat = null, sort = 'new' } = {}) {
+export function queryReels({ q = '', cat = null, tag = null, sort = 'new' } = {}) {
   const fold = (s) =>
     String(s || '')
       .toLocaleLowerCase()
@@ -69,10 +69,11 @@ export function queryReels({ q = '', cat = null, sort = 'new' } = {}) {
   if (cat === 'none') list = list.filter((r) => !r.categoryId);
   else if (cat === 'review') list = list.filter((r) => r.needsReview || !r.categoryId);
   else if (cat) list = list.filter((r) => r.categoryId === cat);
+  if (tag) list = list.filter((r) => (r.tags || []).includes(tag));
   if (terms.length) {
     list = list.filter((r) => {
       const c = categoryById(r.categoryId);
-      const hay = fold([r.caption, r.title, r.notes, r.username, r.creatorName, r.collection, r.shortcode, r.url, c && c.name].join(' '));
+      const hay = fold([r.caption, r.title, r.notes, r.username, r.creatorName, r.collection, (r.tags || []).join(' '), r.shortcode, r.url, c && c.name].join(' '));
       return terms.every((t) => hay.includes(t));
     });
   }
@@ -87,6 +88,11 @@ function creatorStats() {
 }
 
 function applyResult(reel, result) {
+  // AI tag suggestions are kept for the user to confirm (never auto-applied).
+  const suggested = {
+    tagSuggestions: result.aiTags && result.aiTags.length ? result.aiTags.slice(0, 6) : [],
+    newCategorySuggestion: result.aiNewCategory || null,
+  };
   if (result.status === 'confident' && state.settings.autoAssign) {
     return {
       ...reel,
@@ -95,6 +101,7 @@ function applyResult(reel, result) {
       needsReview: false,
       suggestions: result.candidates.map((c) => c.id).filter((id) => id !== result.categoryId).slice(0, 3),
       reasons: result.candidates[0]?.reasons || [],
+      ...suggested,
     };
   }
   return {
@@ -104,6 +111,7 @@ function applyResult(reel, result) {
     needsReview: true,
     suggestions: result.candidates.map((c) => c.id).slice(0, 4),
     reasons: result.candidates[0]?.reasons || [],
+    ...suggested,
   };
 }
 
@@ -152,7 +160,10 @@ export async function addFromText({ text, caption = '', title = '', notes = '', 
       reel = { ...reel, categoryId, categorySource: 'manual', needsReview: false };
     } else {
       const res = await classifyReel(reel);
-      if (res.aiError) out.aiError = res.aiError;
+      if (res.aiError) {
+        out.aiError = res.aiError;
+        if (res.aiErrorStatus) out.aiErrorStatus = res.aiErrorStatus;
+      }
       out.results.set(result.key, res);
       reel = applyResult(reel, res);
     }
@@ -253,6 +264,26 @@ export function assignCategory(id, categoryId) {
     categorySource: categoryId ? 'manual' : null,
     needsReview: !categoryId,
   });
+}
+
+/** Apply user-confirmed tags (merged with existing ones). */
+export async function applyTags(id, tags) {
+  const reel = state.reels.find((r) => r.id === id);
+  if (!reel || !Array.isArray(tags) || !tags.length) return reel;
+  const next = [...new Set([...(reel.tags || []), ...tags.map((t) => String(t).trim()).filter(Boolean)])].slice(0, 24);
+  return updateReel(id, { tags: next, tagSuggestions: (reel.tagSuggestions || []).filter((t) => !next.includes(t)) });
+}
+
+/** Remove a single tag from a reel. */
+export async function removeTag(id, tag) {
+  const reel = state.reels.find((r) => r.id === id);
+  if (!reel) return reel;
+  return updateReel(id, { tags: (reel.tags || []).filter((t) => t !== tag) });
+}
+
+/** Dismiss all AI suggestions for a reel (nothing is applied). */
+export async function rejectSuggestions(id) {
+  return updateReel(id, { suggestions: [], tagSuggestions: [], newCategorySuggestion: null });
 }
 
 export async function deleteReel(id) {

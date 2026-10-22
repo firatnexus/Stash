@@ -148,8 +148,38 @@ export function skeletonCards(n = 3) {
 
 /* --------------------------- Category picker ----------------------- */
 
+/** Let the user apply AI tag suggestions by tapping them (selected = applied). */
+function tagSuggestionRow(reel, selected, onToggle) {
+  if (!(reel.tagSuggestions || []).length) return null;
+  return h(
+    'div',
+    { class: 'field' },
+    h('span', { class: 'label' }, icon('sparkles', 14), t('suggestedTags')),
+    h('p', { class: 'hint' }, t('suggestedTagsHint')),
+    h(
+      'div',
+      { class: 'chip-row', 'data-testid': 'tag-suggestions' },
+      reel.tagSuggestions.map((tg) =>
+        h(
+          'button',
+          {
+            type: 'button',
+            class: 'chip chip-cat',
+            'aria-pressed': String(selected.has(tg)),
+            'data-testid': 'tag-suggestion',
+            onclick: () => onToggle(tg),
+          },
+          h('span', { class: 'dot', 'aria-hidden': 'true' }),
+          tg,
+        ),
+      ),
+    ),
+  );
+}
+
 /**
- * Ask the user to choose a category for a reel. Suggestions come first.
+ * Ask the user to choose a category for a reel. AI suggestions come first.
+ * Tag suggestions are applied only if the user tapped them (never by default).
  * @returns {Promise<string|null|undefined>} chosen id; undefined if dismissed
  */
 export function pickCategorySheet(reelId, { title } = {}) {
@@ -157,6 +187,7 @@ export function pickCategorySheet(reelId, { title } = {}) {
     const reel = store.state.reels.find((r) => r.id === reelId);
     if (!reel) return resolve(undefined);
     let chosen;
+    const selectedTags = new Set();
     const s = sheet({
       title: title || t('chooseCategory'),
       testid: 'pick-category-sheet',
@@ -167,9 +198,18 @@ export function pickCategorySheet(reelId, { title } = {}) {
         const choose = async (id) => {
           chosen = id;
           await store.assignCategory(reel.id, id);
+          if (selectedTags.size) await store.applyTags(reel.id, [...selectedTags]);
           const c = store.categoryById(id);
           toast(c ? t('filedUnder', { name: c.name }) : t('categoryCleared'));
           s.close();
+        };
+        const toggleTag = (tg) => {
+          if (selectedTags.has(tg)) selectedTags.delete(tg);
+          else selectedTags.add(tg);
+          const row = s.el.querySelector('[data-testid="tag-suggestions"]');
+          if (row) {
+            for (const chip of row.children) chip.setAttribute('aria-pressed', String(selectedTags.has(chip.textContent)));
+          }
         };
         body.append(h('div', { class: 'pick-reel' }, reelTile(reel, null), h('div', null, creatorLine(reel), textLine(reel))));
         if (!store.state.categories.length) {
@@ -184,11 +224,61 @@ export function pickCategorySheet(reelId, { title } = {}) {
           if (reel.reasons && reel.reasons.length) body.append(h('p', { class: 'hint' }, t('matchedOn', { words: reel.reasons.join(', ') })));
           body.append(h('div', { class: 'pick-list' }, sug.map((c) => pickRow(c, choose, true))));
         }
+        // One-tap creation of the AI-suggested new category
+        if (reel.newCategorySuggestion && !store.state.categories.some((c) => c.name.toLocaleLowerCase() === reel.newCategorySuggestion.toLocaleLowerCase())) {
+          body.append(
+            h(
+              'button',
+              {
+                class: 'pick-row suggested new-cat',
+                type: 'button',
+                'data-testid': 'new-category-suggestion',
+                onclick: async (e) => {
+                  const b = e.currentTarget;
+                  b.disabled = true;
+                  try {
+                    const c = await store.createCategory({ name: reel.newCategorySuggestion });
+                    await choose(c.id);
+                  } catch {
+                    b.disabled = false;
+                  }
+                },
+              },
+              icon('plus', 16),
+              h('span', { class: 'pick-name' }, t('createNewNamed', { name: reel.newCategorySuggestion })),
+              icon('sparkles', 16),
+            ),
+          );
+        }
         if (others.length) {
           body.append(h('p', { class: 'label' }, sug.length ? t('otherCategories') : t('allCategories')));
           body.append(h('div', { class: 'pick-list' }, others.map((c) => pickRow(c, choose, false))));
         }
+        const tagRow = tagSuggestionRow(reel, selectedTags, toggleTag);
+        if (tagRow) body.append(tagRow);
         body.append(newCategoryInline(async (c) => choose(c.id)));
+        if ((reel.suggestions || []).length || (reel.tagSuggestions || []).length || reel.newCategorySuggestion) {
+          body.append(
+            h(
+              'div',
+              { class: 'sheet-actions reject-row' },
+              h(
+                'button',
+                {
+                  class: 'btn btn-ghost',
+                  type: 'button',
+                  'data-testid': 'reject-suggestions',
+                  onclick: async () => {
+                    await store.rejectSuggestions(reel.id);
+                    toast(t('suggestionsRejected'));
+                    s.close();
+                  },
+                },
+                t('rejectAll'),
+              ),
+            ),
+          );
+        }
       },
     });
   });
@@ -359,6 +449,47 @@ export function reelDetailSheet(reelId) {
           },
         });
         notes.value = r.notes || '';
+        // Tags (user-confirmed; AI suggestions are one tap away)
+        const tagsBlock = h('div', { class: 'field', 'data-testid': 'tags-field' });
+        const drawTags = () => {
+          const rr = store.state.reels.find((x) => x.id === reelId) || r;
+          tagsBlock.replaceChildren();
+          tagsBlock.append(h('span', { class: 'label' }, t('tags')));
+          const chips = h('div', { class: 'chip-row' });
+          for (const tg of rr.tags || []) {
+            chips.append(
+              h('span', { class: 'chip chip-cat', 'data-testid': 'reel-tag' }, h('span', { class: 'dot', 'aria-hidden': 'true' }), tg, h('button', { type: 'button', class: 'kw-x', 'aria-label': t('removeTag', { t: tg }), onclick: () => store.removeTag(rr.id, tg) }, icon('x', 12))),
+            );
+          }
+          if (!(rr.tags || []).length) chips.append(h('span', { class: 'hint' }, t('noTagsYet')));
+          tagsBlock.append(chips);
+          if ((rr.tagSuggestions || []).length) {
+            const sugRow = h('div', { class: 'chip-row' });
+            for (const tg of rr.tagSuggestions) {
+              if ((rr.tags || []).includes(tg)) continue;
+              sugRow.append(
+                h('button', { class: 'chip chip-warn', type: 'button', 'data-testid': 'tag-suggestion', onclick: () => store.applyTags(rr.id, [tg]) }, icon('sparkles', 12), t('addTagSuggestion', { t: tg })),
+              );
+            }
+            if (sugRow.children.length) tagsBlock.append(h('span', { class: 'hint' }, t('suggested')), sugRow);
+          }
+          const tagInput = h('input', { class: 'input input-sm', type: 'text', maxlength: '40', placeholder: t('addTagPlaceholder'), 'aria-label': t('addTag'), enterkeyhint: 'enter' });
+          const addTag = () => {
+            const v = tagInput.value.split(',').map((x) => x.trim().replace(/^#/, '')).filter(Boolean);
+            if (!v.length) return;
+            tagInput.value = '';
+            store.applyTags(rr.id, v);
+          };
+          tagInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ',') {
+              e.preventDefault();
+              addTag();
+            }
+          });
+          tagsBlock.append(h('div', { class: 'row' }, tagInput, h('button', { class: 'btn btn-secondary btn-sm', type: 'button', 'data-testid': 'tag-add', onclick: addTag }, t('add'))));
+        };
+        drawTags();
+
         const notesBlock = h('div', { class: 'field' }, h('label', { class: 'label' }, t('notes')), notes);
 
         const actions = h(
@@ -386,7 +517,7 @@ export function reelDetailSheet(reelId) {
           ),
         );
 
-        body.append(h('div', { class: 'detail' }, h('div', { class: 'detail-left' }, preview, actions), h('div', { class: 'detail-right' }, meta, catBlock, texts, notesBlock)));
+        body.append(h('div', { class: 'detail' }, h('div', { class: 'detail-left' }, preview, actions), h('div', { class: 'detail-right' }, meta, catBlock, tagsBlock, texts, notesBlock)));
       };
       render();
       const unsub = store.subscribe((why) => {

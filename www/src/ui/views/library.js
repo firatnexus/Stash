@@ -3,16 +3,17 @@ import { t } from '../../core/i18n.js';
 import * as store from '../../core/store.js';
 import { reelCard, emptyState, catColor } from '../components.js';
 
-/** Library state lives in the URL hash: #/library?q=..&cat=..&sort=.. */
+/** Library state lives in the URL hash: #/library?q=..&cat=..&tag=..&sort=.. */
 export function readLibraryParams(query) {
   const p = new URLSearchParams(query || '');
-  return { q: p.get('q') || '', cat: p.get('cat') || null, sort: p.get('sort') === 'old' ? 'old' : 'new' };
+  return { q: p.get('q') || '', cat: p.get('cat') || null, tag: p.get('tag') || null, sort: p.get('sort') === 'old' ? 'old' : 'new' };
 }
 
 function writeParams(f) {
   const p = new URLSearchParams();
   if (f.q) p.set('q', f.q);
   if (f.cat) p.set('cat', f.cat);
+  if (f.tag) p.set('tag', f.tag);
   if (f.sort === 'old') p.set('sort', 'old');
   const qs = p.toString();
   history.replaceState(null, '', '#/library' + (qs ? '?' + qs : ''));
@@ -41,6 +42,37 @@ export function renderLibrary(query) {
     ...store.state.categories.map((c) => ({ id: c.id, label: c.name, n: counts.get(c.id) || 0, color: catColor(c) })),
     { id: 'review', label: t('needsCategory'), n: reviewN, warn: true },
   ];
+
+  // Tag filter chips (most used first)
+  const tagFreq = new Map();
+  for (const r of store.state.reels) for (const tg of r.tags || []) tagFreq.set(tg, (tagFreq.get(tg) || 0) + 1);
+  const tagDefs = [...tagFreq.entries()].sort((a, b) => b[1] - a[1]).slice(0, 14).map(([name, n]) => ({ name, n }));
+  const tagChips = h('div', { class: 'filter-chips tag-chips', role: 'group', 'aria-label': t('filterByTag'), 'data-testid': 'tag-chips' });
+  const drawTagChips = () => {
+    tagChips.replaceChildren(
+      ...tagDefs.map((d) =>
+        h(
+          'button',
+          {
+            type: 'button',
+            class: `chip chip-filter${f.tag === d.name ? ' is-active' : ''}`,
+            'aria-pressed': String(f.tag === d.name),
+            'data-testid': 'tag-chip',
+            'data-name': d.name,
+            onclick: () => {
+              f.tag = f.tag === d.name ? null : d.name;
+              writeParams(f);
+              drawTagChips();
+              draw();
+            },
+          },
+          h('span', { class: 'chip-n', style: 'background:var(--surface-3)' }, '#'),
+          d.label,
+          h('span', { class: 'chip-n' }, String(d.n)),
+        ),
+      ),
+    );
+  };
 
   const drawChips = () => {
     chips.replaceChildren(
@@ -129,10 +161,12 @@ export function renderLibrary(query) {
     h('header', { class: 'view-head' }, h('h1', { class: 'view-title' }, t('libraryTitle'))),
     h('div', { class: 'toolbar' }, h('div', { class: 'input-wrap grow' }, icon('search', 18), search), sort),
     chips,
+    tagChips,
     countEl,
     list,
   );
   drawChips();
+  drawTagChips();
   draw();
   return root;
 }

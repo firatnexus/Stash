@@ -23,7 +23,7 @@ export function uid() {
 
 const REEL_FIELDS = [
   'id', 'key', 'shortcode', 'kind', 'url', 'username', 'creatorName', 'caption', 'title', 'collection', 'notes',
-  'thumbnailUrl', 'thumbnailPath', 'avatarUrl', 'avatarPath', 'tags', 'categoryId', 'categorySource', 'needsReview', 'suggestions', 'reasons', 'source', 'savedAt',
+  'thumbnailUrl', 'thumbnailPath', 'avatarUrl', 'avatarPath', 'tags', 'tagSuggestions', 'newCategorySuggestion', 'categoryId', 'categorySource', 'needsReview', 'suggestions', 'reasons', 'source', 'savedAt',
   'addedAt', 'updatedAt',
 ];
 
@@ -48,6 +48,8 @@ export function shapeReel(r) {
     avatarUrl: typeof r.avatarUrl === 'string' && /^(https:|data:image\/)/.test(r.avatarUrl) ? r.avatarUrl : null,
     avatarPath: str(r.avatarPath, 300),
     tags: Array.isArray(r.tags) ? [...new Set(r.tags.map((x) => String(x).trim().slice(0, 40)).filter(Boolean))].slice(0, 24) : [],
+    tagSuggestions: Array.isArray(r.tagSuggestions) ? [...new Set(r.tagSuggestions.map((x) => String(x).trim().slice(0, 40)).filter(Boolean))].slice(0, 6) : [],
+    newCategorySuggestion: str(r.newCategorySuggestion, 40),
     categoryId: r.categoryId || null,
     categorySource: r.categorySource || null,
     needsReview: Boolean(r.needsReview),

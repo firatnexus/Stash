@@ -9,7 +9,7 @@ import { pickCategorySheet, reelDetailSheet, categoryChip } from '../components.
 /** Shared post-add feedback used by quick add, full form and share target. */
 export async function reportAddResult(res, { fromShare = false } = {}) {
   const { added, duplicates, invalid } = res;
-  if (res.aiError) toast(t('aiFailed', { msg: res.aiError }), { tone: 'warn', duration: 5000 });
+  if (res.aiError) toast(aiErrorText(res.aiError, res.aiErrorStatus), { tone: 'warn', duration: 6000 });
   if (added.length === 1 && !duplicates.length) {
     const r = added[0];
     const cat = store.categoryById(r.categoryId);
@@ -35,6 +35,14 @@ export async function reportAddResult(res, { fromShare = false } = {}) {
 
 export function errorText(code) {
   return t('urlErr_' + code);
+}
+
+/** Friendly, specific Turkish messages for common AI provider failures. */
+function aiErrorText(msg, status) {
+  if (status === 401 || status === 403) return t('aiErrAuth');
+  if (status === 429) return t('aiErrQuota');
+  if (status === 0 || /network|fetch|timeout|offline/i.test(String(msg))) return t('aiErrOffline');
+  return t('aiFailed', { msg });
 }
 
 /** Compact URL field shown on the dashboard. */

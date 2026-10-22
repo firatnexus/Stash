@@ -474,6 +474,9 @@ dialog.sheet.closing::backdrop { opacity: 0; transition: opacity 0.18s; }
 .pick-row.suggested { border-color: color-mix(in srgb, var(--primary) 45%, var(--border)); background: var(--primary-soft); font-weight: 700; }
 .pick-row .icon { color: var(--muted); }
 .pick-row.suggested .icon { color: var(--primary); }
+.pick-row.new-cat { color: var(--primary); }
+.reject-row { justify-content: flex-end; border-top: 1px solid var(--border); padding-top: var(--space-2); }
+.tag-chips .chip-filter.is-active { background: var(--text); color: var(--bg); border-color: var(--text); }
 .pick-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .check-row { cursor: pointer; }
 .check-row input { width: 18px; height: 18px; accent-color: var(--primary); }

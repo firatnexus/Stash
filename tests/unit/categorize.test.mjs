@@ -4,7 +4,7 @@ import { fold, tokenize, hashtags, cleanKeywords } from '../../www/src/categoriz
 import { keywordScores, collectionScores } from '../../www/src/categorize/keyword.js';
 import { buildCreatorStats } from '../../www/src/categorize/creator.js';
 import { classifyLocal, classify } from '../../www/src/categorize/engine.js';
-import { buildPrompt, parseAiReply, aiClassify, isAiConfigured, AI_PRESETS } from '../../www/src/categorize/ai.js';
+import { buildPrompt, parseAiReply, aiSuggest, isAiConfigured, AI_PRESETS } from '../../www/src/categorize/ai.js';
 import { STARTERS } from '../../www/src/categorize/starters.js';
 
 const cats = STARTERS.map((s) => ({ id: s.key, name: s.name.en, keywords: s.keywords }));
@@ -62,14 +62,19 @@ test('Instagram collection names and creator history count as signals', () => {
 });
 
 test('AI reply parsing is strict about category names', () => {
-  assert.deepEqual(parseAiReply('{"category":"Travel","confidence":0.9}', cats), { id: 'travel', confidence: 0.9 });
-  assert.deepEqual(parseAiReply('Sure! ```json\n{"category": "game ideas", "confidence": 2}\n```', cats), { id: 'games', confidence: 1 });
-  assert.deepEqual(parseAiReply('{"category":null,"confidence":0.2}', cats), { id: null, confidence: 0.2 });
-  assert.deepEqual(parseAiReply('{"category":"Cars","confidence":0.9}', cats), { id: null, confidence: 0 });
+  assert.deepEqual(parseAiReply('{"categories":["Travel"],"new_category":null,"tags":[],"confidence":0.9}', cats), { categoryIds: ['travel'], newCategory: null, tags: [], confidence: 0.9 });
+  assert.deepEqual(parseAiReply('Sure! ```json\n{"categories": ["game ideas"], "confidence": 2}\n```', cats), { categoryIds: ['games'], newCategory: null, tags: [], confidence: 1 });
+  assert.deepEqual(parseAiReply('{"categories":null,"confidence":0.2}', cats), { categoryIds: [], newCategory: null, tags: [], confidence: 0.2 });
+  // a category that is not in the list is ignored (it may come back as a new_category suggestion instead)
+  assert.deepEqual(parseAiReply('{"categories":["Cars"],"new_category":"Cars","confidence":0.9}', cats), { categoryIds: [], newCategory: 'Cars', tags: [], confidence: 0.9 });
+  assert.deepEqual(parseAiReply('{"categories":[],"new_category":null,"tags":["#cat", "funny", "cat", ""],"confidence":0.5}', cats), { categoryIds: [], newCategory: null, tags: ['cat', 'funny', 'cat'], confidence: 0.5 });
   assert.equal(parseAiReply('no json here', cats), null);
-  const { user } = buildPrompt({ caption: 'hello', username: 'x' }, cats);
+  const { system, user } = buildPrompt({ caption: 'hello', username: 'x' }, cats);
   assert.match(user, /Caption: hello/);
   assert.match(user, /@x/);
+  assert.match(system, /1 to 3/);
+  const noTags = buildPrompt({ caption: 'hello' }, cats, { suggestTags: false });
+  assert.doesNotMatch(noTags.system, /tags/);
   assert.equal(isAiConfigured({ enabled: true, apiKey: 'k', model: 'm', baseUrl: 'u' }), true);
   assert.equal(isAiConfigured({ enabled: false, apiKey: 'k', model: 'm', baseUrl: 'u' }), false);
   assert.ok(AI_PRESETS.openai && AI_PRESETS.anthropic);
@@ -81,7 +86,7 @@ test('AI provider is only called when local result is unsure, and requests are w
   const calls = [];
   const post = async (url, headers, body) => {
     calls.push({ url, headers, body });
-    return { status: 200, data: { choices: [{ message: { content: '{"category":"Funny Videos","confidence":0.8}' } }] } };
+    return { status: 200, data: { choices: [{ message: { content: '{"categories":["Funny Videos"],"new_category":null,"tags":["cat","funny"],"confidence":0.8}' } }] } };
   };
   const sure = await classify({ caption: 'Easy pasta recipe for dinner #cooking' }, cats, { ai, post });
   assert.equal(sure.method, 'keyword');
@@ -95,21 +100,23 @@ test('AI provider is only called when local result is unsure, and requests are w
   assert.equal(calls.length, 1);
   assert.equal(calls[0].url, 'https://api.example.com/v1/chat/completions');
   assert.equal(calls[0].headers.authorization, 'Bearer sk-test');
+  assert.match(calls[0].body.messages[0].content, /1 to 3/);
   assert.equal(r.status, 'confident');
   assert.equal(r.categoryId, 'funny');
   assert.equal(r.method, 'ai');
+  assert.deepEqual(r.aiTags, ['cat', 'funny']); // suggestions only, never auto-applied
 });
 
 test('Anthropic request shape and error handling', async () => {
   let seen;
   const post = async (url, headers, body) => {
     seen = { url, headers, body };
-    return { status: 200, data: { content: [{ type: 'text', text: '{"category":"Learning","confidence":0.4}' }] } };
+    return { status: 200, data: { content: [{ type: 'text', text: '{"categories":["Learning"],"new_category":null,"tags":[],"confidence":0.4}' }] } };
   };
-  const res = await aiClassify({ caption: 'x' }, cats, { ...ai, kind: 'anthropic', baseUrl: 'https://api.anthropic.com/v1' }, post);
+  const res = await aiSuggest({ caption: 'x' }, cats, { ...ai, kind: 'anthropic', baseUrl: 'https://api.anthropic.com/v1' }, post);
   assert.equal(seen.url, 'https://api.anthropic.com/v1/messages');
   assert.equal(seen.headers['x-api-key'], 'sk-test');
-  assert.equal(res.id, 'learning');
+  assert.deepEqual(res.categoryIds, ['learning']);
 
   const low = await classify({ caption: 'my cat did this again' }, cats, { ai: { ...ai, kind: 'anthropic' }, post });
   assert.notEqual(low.status, 'confident');

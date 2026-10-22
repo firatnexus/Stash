@@ -11,7 +11,7 @@
  */
 import { keywordScores, collectionScores, reelText, round } from './keyword.js';
 import { creatorScores } from './creator.js';
-import { aiClassify, isAiConfigured } from './ai.js';
+import { aiSuggest, isAiConfigured } from './ai.js';
 
 export const THRESHOLD = 1; // minimum score for an automatic assignment (one exact keyword)
 export const MARGIN = 2; // best must be at least MARGIN x the runner-up
@@ -60,6 +60,8 @@ export function classifyLocal(reel, categories, { creatorStats } = {}) {
 /**
  * Full classification including the optional AI provider.
  * Never throws: AI failures are reported in `aiError` and the local result stands.
+ * The AI may also SUGGEST tags and a new category name (aiTags/aiNewCategory);
+ * those are never auto-applied — the user confirms them.
  */
 export async function classify(reel, categories, { creatorStats, ai, post } = {}) {
   const local = classifyLocal(reel, categories, { creatorStats });
@@ -67,17 +69,21 @@ export async function classify(reel, categories, { creatorStats, ai, post } = {}
   if (!isAiConfigured(ai) || !post || !local.hasText) return local;
 
   try {
-    const r = await aiClassify(reel, categories, ai, post);
-    if (r && r.id) {
-      const others = local.candidates.filter((c) => c.id !== r.id);
-      const aiCand = { id: r.id, score: round(r.confidence * 3), reasons: ['AI'], sources: ['ai'] };
-      if (r.confidence >= 0.6) {
-        return { status: 'confident', categoryId: r.id, method: 'ai', candidates: [aiCand, ...others].slice(0, 4), hasText: true, aiConfidence: r.confidence };
+    const r = await aiSuggest(reel, categories, ai, post);
+    if (r && (r.categoryIds.length || r.tags.length || r.newCategory)) {
+      const aiCand = r.categoryIds.map((id) => ({ id, score: round(r.confidence * 3), reasons: ['AI'], sources: ['ai'] }));
+      const others = local.candidates.filter((c) => !r.categoryIds.includes(c.id));
+      const candidates = [...aiCand, ...others].slice(0, 4);
+      const extra = { aiTags: r.tags, aiNewCategory: r.newCategory, aiConfidence: r.confidence };
+      if (r.categoryIds.length && r.confidence >= 0.6) {
+        return { ...local, status: 'confident', categoryId: r.categoryIds[0], method: 'ai', candidates, ...extra };
       }
-      return { ...local, candidates: [aiCand, ...others].slice(0, 4), aiConfidence: r.confidence };
+      return { ...local, candidates, ...extra };
     }
     return local;
   } catch (e) {
-    return { ...local, aiError: e.message || String(e) };
+    const err = { ...local, aiError: e.message || String(e) };
+    if (e && e.status) err.aiErrorStatus = e.status;
+    return err;
   }
 }

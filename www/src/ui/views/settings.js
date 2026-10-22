@@ -2,7 +2,7 @@ import { h, icon, toast, confirmSheet, sheet } from '../dom.js';
 import { t, setLang, lang } from '../../core/i18n.js';
 import * as store from '../../core/store.js';
 import { saveTextFile, httpPost, isNative, cacheStats, clearCache } from '../../core/platform.js';
-import { AI_PRESETS, aiClassify } from '../../categorize/ai.js';
+import { AI_PRESETS, aiSuggest } from '../../categorize/ai.js';
 import { backupFileName, validateBackup } from '../../io/backup.js';
 import { APP_VERSION } from '../../version.js';
 import { applyTheme } from '../theme.js';
@@ -109,8 +109,8 @@ function aiSection() {
         status.textContent = t('aiTesting');
         try {
           const cats = store.state.categories.length ? store.state.categories : [{ id: 'x', name: 'Recipes', keywords: [] }, { id: 'y', name: 'Travel', keywords: [] }];
-          const r = await aiClassify({ caption: 'Quick 15 minute pasta with garlic and lemon' }, cats, ai, httpPost);
-          status.textContent = r ? t('aiOk', { name: (cats.find((c) => c.id === r.id) || {}).name || '—' }) : t('aiOddReply');
+          const r = await aiSuggest({ caption: 'Quick 15 minute pasta with garlic and lemon' }, cats, ai, httpPost);
+          status.textContent = r ? t('aiOk', { name: (cats.find((c) => c.id === r.categoryIds[0]) || {}).name || '—' }) : t('aiOddReply');
         } catch (e) {
           status.textContent = t('aiFailed', { msg: e.message });
         } finally {
@@ -136,6 +136,17 @@ function aiSection() {
     { class: 'panel', 'data-testid': 'ai-section' },
     h('h2', { class: 'section-title' }, icon('sparkles', 18), t('aiTitle')),
     row(t('aiEnable'), toggle(ai.enabled, (v) => { ai.enabled = v; fields.hidden = !v; save(); }, 'ai-enable', t('aiEnable')), t('aiEnableHint')),
+    h(
+      'div',
+      { class: 'set-row' },
+      h(
+        'div',
+        { class: 'set-text' },
+        h('span', { class: 'set-label' }, t('aiSuggestTags')),
+        h('span', { class: 'hint' }, t('aiWhatSent')),
+      ),
+      toggle(ai.suggestTags !== false, (v) => { ai.suggestTags = v; save(); }, 'ai-suggest-tags', t('aiSuggestTags')),
+    ),
     fields,
   );
 }
