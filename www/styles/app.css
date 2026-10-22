@@ -127,9 +127,7 @@ p.hint { display: block; }
   height: calc(var(--nav-h) + var(--safe-b));
   padding: 0 var(--space-2) var(--safe-b);
   display: grid; grid-template-columns: repeat(5, 1fr); align-items: center;
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: var(--surface);
   border-top: 1px solid var(--border);
 }
 .nav-item {
@@ -365,7 +363,7 @@ button.chip-cat:hover { background: color-mix(in srgb, var(--cat, var(--c-none))
 .tile-sm { width: 64px; height: 96px; }
 .tile-lg { width: 100%; aspect-ratio: 9 / 12; max-height: 360px; border-radius: var(--radius-lg); }
 .tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.tile-kind { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: rgb(255 255 255 / 0.22); backdrop-filter: blur(4px); }
+.tile-kind { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: rgb(255 255 255 / 0.28); }
 .tile-lg .tile-kind { width: 56px; height: 56px; }
 .tile-initial { position: absolute; left: 8px; bottom: 6px; font-family: var(--font-display); font-weight: 800; font-size: var(--text-lg); opacity: 0.85; line-height: 1; }
 .tile-lg .tile-initial { font-size: 2.5rem; left: 16px; bottom: 12px; }
@@ -405,8 +403,7 @@ button.chip-cat:hover { background: color-mix(in srgb, var(--cat, var(--c-none))
   position: fixed; left: 0; right: 0; bottom: calc(var(--nav-h) + var(--safe-b));
   z-index: 30; display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap;
   padding: var(--space-2) var(--space-4);
-  background: color-mix(in srgb, var(--surface) 94%, transparent);
-  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  background: var(--surface);
   border-top: 1px solid var(--border);
   box-shadow: 0 -4px 24px rgb(0 0 0 / 0.08);
 }
@@ -557,7 +554,7 @@ dialog.sheet.closing::backdrop { opacity: 0; transition: opacity 0.18s; }
 .detail-left { display: flex; flex-direction: column; gap: var(--space-3); }
 .detail-right { display: flex; flex-direction: column; gap: var(--space-5); min-width: 0; }
 .detail-preview { position: relative; }
-.detail-preview .preview-btn { position: absolute; bottom: var(--space-3); right: var(--space-3); background: rgb(0 0 0 / 0.45); color: #fff; backdrop-filter: blur(6px); }
+.detail-preview .preview-btn { position: absolute; bottom: var(--space-3); right: var(--space-3); background: rgb(0 0 0 / 0.6); color: #fff; }
 .detail-preview .preview-btn:hover { background: rgb(0 0 0 / 0.6); }
 .detail-preview .embed { width: 100%; height: 560px; border: 0; border-radius: var(--radius-lg); background: var(--surface-2); }
 @media (max-width: 719px) { .detail-preview .tile-lg { aspect-ratio: 16 / 10; max-height: 220px; } }
