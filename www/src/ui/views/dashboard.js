@@ -1,13 +1,24 @@
 import { h, icon } from '../dom.js';
 import { t } from '../../core/i18n.js';
 import * as store from '../../core/store.js';
-import { reelCard, emptyState, reelTile, pickCategorySheet } from '../components.js';
+import { reelCard, emptyState, reelTile, pickCategorySheet, reelDetailSheet } from '../components.js';
 import { quickAddForm } from './add.js';
+
+/** A stable "revisit" pick: same reel all day, changes tomorrow. */
+function revisitPick(reels) {
+  if (reels.length < 2) return null;
+  const day = Math.floor(Date.now() / 86400000);
+  const older = reels.filter((r) => Date.now() - r.addedAt > 7 * 86400000);
+  const pool = older.length ? older : reels;
+  const seed = (day * 2654435761) % pool.length;
+  return pool[seed];
+}
 
 export function renderDashboard() {
   const { reels, categories } = store.state;
   const queue = store.reviewQueue();
-  const recent = [...reels].sort((a, b) => b.addedAt - a.addedAt).slice(0, 8);
+  const recent = [...reels].sort((a, b) => b.addedAt - a.addedAt).slice(0, 4);
+  const revisit = revisitPick(reels);
   const root = h('div', { class: 'view view-dashboard', 'data-testid': 'view-dashboard' });
 
   root.append(
@@ -42,7 +53,12 @@ export function renderDashboard() {
       h(
         'section',
         { class: 'section', 'data-testid': 'review-section' },
-        h('div', { class: 'section-head' }, h('h2', { class: 'section-title' }, t('reviewTitle'), h('span', { class: 'count' }, queue.length)), h('a', { class: 'link', href: '#/library?cat=review' }, t('seeAll'))),
+        h(
+          'div',
+          { class: 'section-head' },
+          h('h2', { class: 'section-title' }, t('reviewTitle'), h('span', { class: 'count' }, queue.length)),
+          h('a', { class: 'link', href: '#/library?cat=review', 'data-testid': 'review-all' }, t('seeAll')),
+        ),
         h('p', { class: 'hint' }, t('reviewHint')),
         h(
           'div',
@@ -55,6 +71,28 @@ export function renderDashboard() {
               h('span', { class: 'review-label' }, r.username ? '@' + r.username : r.caption ? r.caption.slice(0, 24) : r.shortcode),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  if (revisit) {
+    root.append(
+      h(
+        'section',
+        { class: 'section', 'data-testid': 'revisit-section' },
+        h('div', { class: 'section-head' }, h('h2', { class: 'section-title' }, icon('sparkles', 18), t('revisitTitle'))),
+        h(
+          'button',
+          { class: 'revisit-card', type: 'button', 'data-testid': 'revisit-card', onclick: () => store.state.reels.find((r) => r.id === revisit.id) && reelDetailSheet(revisit.id) },
+          reelTile(revisit, store.categoryById(revisit.categoryId)),
+          h(
+            'div',
+            { class: 'revisit-main' },
+            h('span', { class: 'creator' }, revisit.username ? '@' + revisit.username : t('unknownCreator')),
+            h('span', { class: 'revisit-text' }, revisit.caption || revisit.title || revisit.notes || t('noCaption')),
+          ),
+          icon('chevron', 18),
         ),
       ),
     );

@@ -72,27 +72,39 @@ export function openButton(reel, { label = false } = {}) {
   );
 }
 
-/** Reel card used in dashboard and library. */
-export function reelCard(reel) {
+/**
+ * Reel card used in dashboard and library.
+ * In select mode the card toggles selection instead of opening details.
+ */
+export function reelCard(reel, opts = {}) {
   const cat = store.categoryById(reel.categoryId);
   const needs = !reel.categoryId || reel.needsReview;
   const card = h(
     'article',
     {
-      class: 'reel-card',
+      class: `reel-card${opts.selectable ? ' selectable' : ''}${opts.selected ? ' selected' : ''}`,
       tabindex: '0',
       role: 'button',
       'aria-label': t('reelDetails'),
+      'aria-pressed': opts.selectable ? String(Boolean(opts.selected)) : null,
       'data-testid': 'reel-card',
       'data-key': reel.key,
-      onclick: () => reelDetailSheet(reel.id),
+      onclick: opts.selectable ? () => opts.onToggle(reel.id) : () => reelDetailSheet(reel.id),
       onkeydown: (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          reelDetailSheet(reel.id);
+          if (opts.selectable) opts.onToggle(reel.id);
+          else reelDetailSheet(reel.id);
         }
       },
     },
+    opts.selectable
+      ? h(
+          'span',
+          { class: `reel-check${opts.selected ? ' on' : ''}`, 'aria-hidden': 'true' },
+          opts.selected ? icon('check', 14) : null,
+        )
+      : null,
     reelTile(reel, cat),
     h(
       'div',

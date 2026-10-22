@@ -286,6 +286,23 @@ export async function rejectSuggestions(id) {
   return updateReel(id, { suggestions: [], tagSuggestions: [], newCategorySuggestion: null });
 }
 
+/** Bulk: file many reels into one category with a single notify. */
+export async function bulkAssign(ids, categoryId) {
+  for (const id of ids) {
+    const next = await repo.updateReel(id, { categoryId: categoryId || null, categorySource: categoryId ? 'manual' : null, needsReview: !categoryId });
+    const i = state.reels.findIndex((r) => r.id === id);
+    if (i >= 0) state.reels[i] = next;
+  }
+  emit('reels');
+}
+
+/** Bulk: delete many reels with a single notify. */
+export async function bulkDelete(ids) {
+  for (const id of ids) await repo.deleteReel(id);
+  state.reels = state.reels.filter((r) => !ids.includes(r.id));
+  emit('reels');
+}
+
 export async function deleteReel(id) {
   await repo.deleteReel(id);
   state.reels = state.reels.filter((r) => r.id !== id);
