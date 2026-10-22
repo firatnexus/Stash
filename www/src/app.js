@@ -5,7 +5,7 @@ import * as store from './core/store.js';
 import { t, setLang, onLangChange } from './core/i18n.js';
 import { h, icon, toast, closeTopSheet, closeAllSheets, clear } from './ui/dom.js';
 import { applyTheme } from './ui/theme.js';
-import { takePendingShare, onShare, onBackButton, exitApp, markFirstFrame } from './core/platform.js';
+import { takePendingShare, onShare, onBackButton, exitApp, markFirstFrame, haptic } from './core/platform.js';
 import { renderDashboard } from './ui/views/dashboard.js';
 import { renderLibrary } from './ui/views/library.js';
 import { renderAdd, reportAddResult } from './ui/views/add.js';
@@ -136,6 +136,16 @@ onBackButton(() => {
 });
 
 /* ------------------------------- Boot ------------------------------ */
+
+// Native haptic tick on touch presses (buttons, cards, nav). Mouse presses stay silent.
+document.addEventListener(
+  'pointerdown',
+  (e) => {
+    if (e.pointerType === 'mouse') return;
+    if (e.target.closest && e.target.closest('button, a.nav-item, .reel-card, [role="button"], .chip, .pick-row, .review-item, .revisit-card')) haptic(8);
+  },
+  { passive: true },
+);
 
 async function boot() {
   render();

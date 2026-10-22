@@ -377,4 +377,26 @@ public class ReelsBridgePlugin extends Plugin {
         if (files != null) for (File f : files) if (f.isFile()) f.delete();
         call.resolve();
     }
+
+    /** Short vibration tick for button presses (capped at 30ms). */
+    @PluginMethod
+    public void haptic(PluginCall call) {
+        Integer msBoxed = call.getInt("ms", 8);
+        int ms = Math.min(msBoxed == null ? 8 : msBoxed, 30);
+        try {
+            android.os.Vibrator v = (android.os.Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
+            if (v == null) {
+                call.resolve();
+                return;
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                v.vibrate(android.os.VibrationEffect.createOneShot(ms, android.os.VibrationEffect.DEFAULT_AMPLITUDE));
+            } else {
+                v.vibrate(ms);
+            }
+        } catch (Exception ignored) {
+            // haptics are best-effort
+        }
+        call.resolve();
+    }
 }

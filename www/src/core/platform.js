@@ -219,6 +219,22 @@ export function setSystemBars(dark) {
   if (b) b.setSystemBars({ dark }).catch(() => {});
 }
 
+/* ------------------------------ Haptics ---------------------------- */
+
+/** Short native haptic tick (used for button presses; touch only). */
+export function haptic(ms = 8) {
+  const b = bridge();
+  if (b) {
+    b.haptic({ ms }).catch(() => {});
+    return;
+  }
+  try {
+    navigator.vibrate && navigator.vibrate(ms);
+  } catch {
+    /* ignore */
+  }
+}
+
 /* ------------------------------ Lifecycle -------------------------- */
 
 /** Tell the native layer its first frame is painted (releases the splash). */

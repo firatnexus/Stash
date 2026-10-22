@@ -106,16 +106,20 @@ const openSheets = [];
 
 /**
  * Open a bottom sheet (modal dialog). Returns {el, close, body}.
- * The sheet closes on backdrop tap, Escape, and Android back button.
+ * The sheet closes on backdrop tap, Escape, Android back button and
+ * drag-to-dismiss from the grip/header (follows the finger, closes past
+ * 30% of its height or on a fast downward flick, springs back otherwise).
  */
 export function sheet({ title, content, onClose, testid = 'sheet', size = 'md' }) {
   const body = h('div', { class: 'sheet-body' });
   const closeBtn = h('button', { class: 'icon-btn', type: 'button', 'aria-label': 'Close', 'data-testid': 'sheet-close' }, icon('x'));
+  const grip = h('div', { class: 'sheet-grip', 'aria-hidden': 'true' });
+  const head = h('header', { class: 'sheet-head' }, h('h2', { class: 'sheet-title', id: 'sheet-title-' + openSheets.length }, title), closeBtn);
   const dlg = h(
     'dialog',
     { class: `sheet sheet-${size}`, 'data-testid': testid, 'aria-labelledby': 'sheet-title-' + openSheets.length },
-    h('div', { class: 'sheet-grip', 'aria-hidden': 'true' }),
-    h('header', { class: 'sheet-head' }, h('h2', { class: 'sheet-title', id: 'sheet-title-' + openSheets.length }, title), closeBtn),
+    grip,
+    head,
     body,
   );
   let closed = false;
@@ -149,6 +153,52 @@ export function sheet({ title, content, onClose, testid = 'sheet', size = 'md' }
   document.body.append(dlg);
   dlg.showModal();
   openSheets.push(api);
+
+  /* --------------------- Drag to dismiss (touch/pen) ------------------ */
+  let dragY0 = 0;
+  let lastY = 0;
+  let lastT = 0;
+  let vel = 0;
+  let dragging = false;
+  const canDrag = () => window.matchMedia('(max-width: 719px)').matches;
+  const onDown = (e) => {
+    if (!canDrag()) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    if (e.target.closest('button, input, select, textarea, a')) return;
+    dragging = true;
+    dragY0 = lastY = e.clientY;
+    lastT = performance.now();
+    vel = 0;
+    dlg.classList.add('dragging');
+  };
+  const onMove = (e) => {
+    if (!dragging) return;
+    const now = performance.now();
+    vel = (e.clientY - lastY) / Math.max(now - lastT, 1);
+    lastY = e.clientY;
+    lastT = now;
+    const dy = Math.max(0, e.clientY - dragY0); // sheet only follows downward drags
+    dlg.style.transform = `translateY(${dy}px)`;
+  };
+  const onUp = () => {
+    if (!dragging) return;
+    dragging = false;
+    dlg.classList.remove('dragging');
+    const dy = lastY - dragY0;
+    const h = dlg.offsetHeight || 1;
+    if (dy > h * 0.3 || (vel > 0.5 && dy > 40)) {
+      dlg.style.transform = '';
+      close();
+    } else {
+      dlg.style.transform = ''; // springs back via the base transition
+    }
+  };
+  for (const el of [grip, head]) {
+    el.addEventListener('pointerdown', onDown);
+  }
+  dlg.addEventListener('pointermove', onMove);
+  dlg.addEventListener('pointerup', onUp);
+  dlg.addEventListener('pointercancel', onUp);
   return api;
 }
 
