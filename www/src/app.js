@@ -5,7 +5,8 @@ import * as store from './core/store.js';
 import { t, setLang, onLangChange } from './core/i18n.js';
 import { h, icon, toast, closeTopSheet, closeAllSheets, clear } from './ui/dom.js';
 import { applyTheme } from './ui/theme.js';
-import { takePendingShare, onShare, onBackButton, exitApp, markFirstFrame, haptic } from './core/platform.js';
+import { takePendingShare, onShare, onBackButton, exitApp, markFirstFrame, haptic, onResume, readClipboard } from './core/platform.js';
+import { extractInstagramUrls } from './instagram/url.js';
 import { renderDashboard } from './ui/views/dashboard.js';
 import { renderLibrary } from './ui/views/library.js';
 import { renderAdd, reportAddResult } from './ui/views/add.js';
@@ -123,7 +124,34 @@ function handleShare(payload) {
   return shareQueue;
 }
 
-/* ---------------------------- Back button -------------------------- */
+/* ------------------------- Clipboard offer ------------------------- */
+
+// When the app comes to the FOREGROUND, we may look at the clipboard once and
+// offer an unsaved Instagram link with a clear prompt. Nothing is ever added
+// or stored without the user tapping 'Add' on the prompt.
+let lastClipOffer = null;
+let clipToast = null;
+function clipboardOffer() {
+  if (document.visibilityState !== 'visible') return; // foreground only, never in background
+  if (clipToast) return;
+  readClipboard()
+    .then((txt) => {
+      if (clipToast || !txt) return;
+      const { found } = extractInstagramUrls(txt);
+      const link = found.find((l) => !store.state.reels.some((r) => r.key === l.key));
+      if (!link || link.key === lastClipOffer) return;
+      lastClipOffer = link.key;
+      clipToast = toast(t('clipboardOffer'), {
+        action: t('add'),
+        duration: 8000,
+        onAction: () => handleShare({ text: link.url }),
+      });
+      setTimeout(() => (clipToast = null), 8500);
+    })
+    .catch(() => {});
+}
+
+/* ------------------------------ Back button -------------------------- */
 
 onBackButton(() => {
   if (closeTopSheet()) return;
@@ -162,6 +190,7 @@ async function boot() {
   markFirstFrame(); // native splash can hand off now
 
   onShare(handleShare);
+  onResume(clipboardOffer);
   const pending = await takePendingShare();
   if (pending) await handleShare(pending);
 
