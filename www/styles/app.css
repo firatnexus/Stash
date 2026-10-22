@@ -154,7 +154,7 @@ p.hint { display: block; }
     border-top: 0; border-right: 1px solid var(--border);
     background: var(--surface);
   }
-  .nav::before { order: -2; content: 'Reels Organizer'; font-family: var(--font-display); font-weight: 800; font-size: var(--text-lg); padding: 0 var(--space-3) var(--space-6); letter-spacing: -0.01em; }
+  .nav::before { order: -2; content: 'Sakla'; font-family: var(--font-display); font-weight: 800; font-size: var(--text-lg); padding: 0 var(--space-3) var(--space-6); letter-spacing: -0.01em; }
   .nav-item { flex-direction: row; justify-content: flex-start; gap: var(--space-3); height: 44px; padding: 0 var(--space-3); border-radius: var(--radius); font-size: var(--text-sm); }
   .nav-item:hover { background: var(--surface-2); color: var(--text); }
   .nav-item[aria-current='page'] { background: var(--surface-2); }

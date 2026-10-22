@@ -58,7 +58,7 @@ export function renderSettings() {
       h('ul', { class: 'bullets' }, h('li', null, t('privacy1')), h('li', null, t('privacy2')), h('li', null, t('privacy3')), h('li', null, t('privacy4'))),
       h('h2', { class: 'section-title' }, icon('info', 18), t('worksTitle')),
       h('ul', { class: 'bullets' }, [1, 2, 3, 4, 5].map((i) => h('li', null, t('works' + i)))),
-      h('p', { class: 'hint version', 'data-testid': 'app-version' }, `Reels Organizer ${APP_VERSION}${isNative() ? ' · Android' : ' · Web'}`),
+      h('p', { class: 'hint version', 'data-testid': 'app-version' }, `${t('appName')} ${APP_VERSION}${isNative() ? ' · Android' : ' · Web'}`),
     ),
   );
   return root;

@@ -4,7 +4,7 @@
  */
 
 const en = {
-  appName: 'Reels Organizer',
+  appName: 'Sakla',
   navHome: 'Home', navLibrary: 'Library', navAdd: 'Add', navCategories: 'Categories', navSettings: 'Settings',
   today: 'Today', yesterday: 'Yesterday',
   add: 'Add', addReel: 'Add a Reel', save: 'Save', create: 'Create', cancel: 'Cancel', delete: 'Delete', undo: 'Undo', change: 'Change', show: 'Show', restore: 'Restore', paste: 'Paste', search: 'Search', sort: 'Sort', all: 'All',
@@ -35,8 +35,8 @@ const en = {
   willFile: 'Will be filed under', maybe: 'Maybe', willAsk: 'You will be asked to confirm.', noMatchWillAsk: 'No category matched. You will be asked to choose.', noTextWillAsk: 'A link alone has no text to sort by. Add a caption or notes, or you will be asked to choose.', noCategoriesHint: 'Create categories to enable automatic sorting.',
   savedTo: 'Saved to {name}', whereToFile: 'Where should this Reel go?', addedMany: '{n} Reel added, {filed} sorted automatically|{n} Reels added, {filed} sorted automatically', alreadySaved: 'This Reel is already in your library', alreadySavedMany: '{n} Reels were already in your library',
   clipboardEmpty: 'Clipboard is empty', shareNoLink: 'The shared content had no Instagram link. Paste the link below.',
-  shareTitle: 'Share straight from Instagram', shareStep1: 'In Instagram, open a Reel and tap the Share (paper plane) button.', shareStep2: 'Tap “Share to…” (or “More”) and choose Reels Organizer.', shareStep3: 'The Reel is saved and sorted. If it is unclear, the app asks you for the category.',
-  shareNote: 'If Reels Organizer is not in the list, use “Copy link” and paste it here.',
+  shareTitle: 'Share straight from Instagram', shareStep1: 'In Instagram, open a Reel and tap the Share (paper plane) button.', shareStep2: 'Tap “Share to…” (or “More”) and choose Sakla.', shareStep3: 'The Reel is saved and sorted. If it is unclear, the app asks you for the category.',
+  shareNote: 'If Sakla is not in the list, use “Copy link” and paste it here.',
   exportTitle: 'Import from Instagram data export', exportIntro: 'Instagram can give you a file with links to everything you saved. Import it to add all of them at once.', exportHowTo: 'How to get the file',
   exportStep1: 'Instagram → Profile → ☰ → Accounts Center → Your information and permissions.', exportStep2: 'Export your information → Create export → choose your Instagram account → Export to device.', exportStep3: 'Customize information: select only “Saved”. Date range: All time. Format: JSON.', exportStep4: 'Start the export. Instagram sends a notification when the ZIP is ready (minutes to a few days).', exportStep5: 'Download the ZIP and choose it here. You do not need to unzip it.',
   chooseExportFile: 'Choose ZIP / JSON file', reading: 'Reading {name}…', exportNoLinks: 'No Instagram links were found in this file.',
@@ -63,7 +63,7 @@ const en = {
   aiTitle: 'AI sorting (optional)', aiEnable: 'Use an AI provider', aiEnableHint: 'Only for Reels that keywords cannot sort, and only when there is text. Sends that text and your category names to the provider you choose.',
   aiProvider: 'Provider', aiBaseUrl: 'API base URL', aiModel: 'Model', aiModelPlaceholder: 'e.g. gpt-4o-mini', aiKey: 'API key', aiKeyPlaceholder: 'Stored only on this device', aiKeyHint: 'Kept on this device. Never included in backups.', aiTest: 'Test connection', aiTesting: 'Testing…', aiIncomplete: 'Fill in base URL, model and key first.', aiOk: 'Works. Test caption was sorted as: {name}', aiOddReply: 'Connected, but the reply was not understood. Try another model.', aiFailed: 'AI sorting failed: {msg}',
   dataTitle: 'Your data', dataText: '{reels} Reels and {cats} categories are stored on this device only.', exportData: 'Export backup (JSON)', importData: 'Restore backup', backupSaved: 'Backup saved', backupSaveFailed: 'Could not save: {msg}',
-  backupErr_invalid: 'This is not a valid backup file.', backupErr_wrong_app: 'This file is not a Reels Organizer backup.', backupErr_newer_schema: 'This backup is from a newer app version. Update the app first.',
+  backupErr_invalid: 'This is not a valid backup file.', backupErr_wrong_app: 'This file is not a Sakla backup.', backupErr_newer_schema: 'This backup is from a newer app version. Update the app first.',
   restoreTitle: 'Restore backup', restoreFound: 'Backup contains {reels} Reels and {cats} categories ({date}).', restoreMerge: 'Merge', restoreMergeHint: 'Keep current data and add what is missing. Duplicates are skipped.', restoreReplace: 'Replace', restoreReplaceHint: 'Delete current Reels and categories, then restore the backup.', restoreDone: 'Restored {reels} Reels and {cats} new categories ({dup} duplicates skipped)',
   wipe: 'Delete all data', wipeQ: 'Delete everything?', wipeMsg: 'All Reels, categories and settings are removed from this device. Export a backup first if you might need them.', wipeConfirm: 'Delete everything', wiped: 'All data deleted',
   privacyTitle: 'Privacy', privacy1: 'Everything is stored on this device. There is no account and no server.', privacy2: 'The app never asks for your Instagram password and never reads Instagram cookies or private data.', privacy3: 'Nothing is sent anywhere unless you turn on AI sorting or load an Instagram preview.', privacy4: 'Opening a Reel hands the link to the Instagram app (needs internet).',
@@ -72,7 +72,7 @@ const en = {
 };
 
 const tr = {
-  appName: 'Reels Organizer',
+  appName: 'Sakla',
   navHome: 'Ana sayfa', navLibrary: 'Kitaplık', navAdd: 'Ekle', navCategories: 'Kategoriler', navSettings: 'Ayarlar',
   today: 'Bugün', yesterday: 'Dün',
   add: 'Ekle', addReel: 'Reel ekle', save: 'Kaydet', create: 'Oluştur', cancel: 'Vazgeç', delete: 'Sil', undo: 'Geri al', change: 'Değiştir', show: 'Göster', restore: 'Geri yükle', paste: 'Yapıştır', search: 'Ara', sort: 'Sırala', all: 'Tümü',
@@ -100,8 +100,8 @@ const tr = {
   willFile: 'Şuraya eklenecek:', maybe: 'Olabilir:', willAsk: 'Onaylaman istenecek.', noMatchWillAsk: 'Hiçbir kategori eşleşmedi. Seçmen istenecek.', noTextWillAsk: 'Tek başına bağlantıda kategori seçmek için metin yok. Açıklama ya da not ekle; yoksa seçmen istenecek.', noCategoriesHint: 'Otomatik kategori seçimi için kategori oluştur.',
   savedTo: '{name} kategorisine kaydedildi', whereToFile: 'Bu Reel nereye gitsin?', addedMany: '{n} Reel eklendi, {filed} tanesi otomatik ayrıldı', alreadySaved: 'Bu Reel zaten kitaplığında', alreadySavedMany: '{n} Reel zaten kitaplığındaydı',
   clipboardEmpty: 'Pano boş', shareNoLink: 'Paylaşılan içerikte Instagram bağlantısı yoktu. Bağlantıyı aşağıya yapıştır.',
-  shareTitle: 'Doğrudan Instagram\'dan paylaş', shareStep1: 'Instagram\'da bir Reel aç ve Paylaş (kâğıt uçak) düğmesine dokun.', shareStep2: '“Şurada paylaş…” (ya da “Diğer”) seçeneğine dokun ve Reels Organizer\'ı seç.', shareStep3: 'Reel kaydedilir ve ayrılır. Emin olunamazsa uygulama sana kategoriyi sorar.',
-  shareNote: 'Reels Organizer listede yoksa “Bağlantıyı kopyala”yı kullanıp buraya yapıştır.',
+  shareTitle: 'Doğrudan Instagram\'dan paylaş', shareStep1: 'Instagram\'da bir Reel aç ve Paylaş (kâğıt uçak) düğmesine dokun.', shareStep2: '“Şurada paylaş…” (ya da “Diğer”) seçeneğine dokun ve Sakla\'yı seç.', shareStep3: 'Reel kaydedilir ve ayrılır. Emin olunamazsa uygulama sana kategoriyi sorar.',
+  shareNote: 'Sakla listede yoksa “Bağlantıyı kopyala”yı kullanıp buraya yapıştır.',
   exportTitle: 'Instagram veri dışa aktarımından al', exportIntro: 'Instagram, kaydettiğin her şeyin bağlantılarını içeren bir dosya verebilir. Hepsini tek seferde eklemek için içe al.', exportHowTo: 'Dosya nasıl alınır',
   exportStep1: 'Instagram → Profil → ☰ → Hesaplar Merkezi → Bilgilerin ve izinlerin.', exportStep2: 'Bilgilerini dışa aktar → Dışa aktarma oluştur → Instagram hesabını seç → Cihaza aktar.', exportStep3: 'Bilgileri özelleştir: yalnızca “Kaydedilenler”i seç. Tarih aralığı: Tüm zamanlar. Biçim: JSON.', exportStep4: 'Dışa aktarmayı başlat. ZIP hazır olunca Instagram bildirim gönderir (birkaç dakika ile birkaç gün arası).', exportStep5: 'ZIP\'i indir ve burada seç. Açmana gerek yok.',
   chooseExportFile: 'ZIP / JSON dosyası seç', reading: '{name} okunuyor…', exportNoLinks: 'Bu dosyada Instagram bağlantısı bulunamadı.',
@@ -125,7 +125,7 @@ const tr = {
   aiTitle: 'Yapay zekâ ile kategori seçimi (isteğe bağlı)', aiEnable: 'Yapay zekâ sağlayıcısı kullan', aiEnableHint: 'Yalnızca anahtar kelimelerin ayıramadığı ve metni olan Reels için. O metni ve kategori adlarını seçtiğin sağlayıcıya gönderir.',
   aiProvider: 'Sağlayıcı', aiBaseUrl: 'API adresi', aiModel: 'Model', aiModelPlaceholder: 'ör. gpt-4o-mini', aiKey: 'API anahtarı', aiKeyPlaceholder: 'Yalnızca bu cihazda saklanır', aiKeyHint: 'Bu cihazda tutulur. Yedeklere asla eklenmez.', aiTest: 'Bağlantıyı test et', aiTesting: 'Test ediliyor…', aiIncomplete: 'Önce API adresi, model ve anahtarı gir.', aiOk: 'Çalışıyor. Test açıklaması şuraya ayrıldı: {name}', aiOddReply: 'Bağlandı ama yanıt anlaşılamadı. Başka bir model dene.', aiFailed: 'Yapay zekâ ile kategori seçimi başarısız: {msg}',
   dataTitle: 'Verilerin', dataText: '{reels} Reel ve {cats} kategori yalnızca bu cihazda saklanıyor.', exportData: 'Yedeği dışa aktar (JSON)', importData: 'Yedeği geri yükle', backupSaved: 'Yedek kaydedildi', backupSaveFailed: 'Kaydedilemedi: {msg}',
-  backupErr_invalid: 'Bu geçerli bir yedek dosyası değil.', backupErr_wrong_app: 'Bu dosya bir Reels Organizer yedeği değil.', backupErr_newer_schema: 'Bu yedek daha yeni bir uygulama sürümünden. Önce uygulamayı güncelle.',
+  backupErr_invalid: 'Bu geçerli bir yedek dosyası değil.', backupErr_wrong_app: 'Bu dosya bir Sakla yedeği değil.', backupErr_newer_schema: 'Bu yedek daha yeni bir uygulama sürümünden. Önce uygulamayı güncelle.',
   restoreTitle: 'Yedeği geri yükle', restoreFound: 'Yedekte {reels} Reel ve {cats} kategori var ({date}).', restoreMerge: 'Birleştir', restoreMergeHint: 'Mevcut verileri koru, eksik olanları ekle. Kopyalar atlanır.', restoreReplace: 'Değiştir', restoreReplaceHint: 'Mevcut Reels ve kategorileri sil, ardından yedeği yükle.', restoreDone: '{reels} Reel ve {cats} yeni kategori geri yüklendi ({dup} kopya atlandı)',
   wipe: 'Tüm verileri sil', wipeQ: 'Her şey silinsin mi?', wipeMsg: 'Tüm Reels, kategoriler ve ayarlar bu cihazdan silinir. Gerekebilirse önce yedek al.', wipeConfirm: 'Her şeyi sil', wiped: 'Tüm veriler silindi',
   privacyTitle: 'Gizlilik', privacy1: 'Her şey bu cihazda saklanır. Hesap ya da sunucu yok.', privacy2: 'Uygulama Instagram şifreni asla istemez; Instagram çerezlerini veya özel verilerini okumaz.', privacy3: 'Yapay zekâ ile kategori seçimini açmadıkça ya da Instagram önizlemesi yüklemedikçe hiçbir yere veri gönderilmez.', privacy4: 'Bir Reel\'i açmak bağlantıyı Instagram uygulamasına iletir (internet gerekir).',

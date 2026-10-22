@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Reels Organizer</string>
-    <string name="title_activity_main">Reels Organizer</string>
+    <string name="app_name">Sakla</string>
+    <string name="title_activity_main">Sakla</string>
     <string name="package_name">io.github.firatnexus.reelsorganizer</string>
     <string name="custom_url_scheme">io.github.firatnexus.reelsorganizer</string>
-    <string name="share_label">Save to Reels Organizer</string>
+    <string name="share_label">Save to Sakla</string>
 </resources>

@@ -27,7 +27,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Small native bridge for Reels Organizer.
+ * Small native bridge for Sakla (Reels Organizer).
  *
  * - Receives text shared from other apps (Instagram "Share" -> Reels Organizer).
  * - Opens links with ACTION_VIEW so instagram.com links go to the Instagram app.

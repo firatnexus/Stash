@@ -1,6 +1,6 @@
 {
   "appId": "io.github.firatnexus.reelsorganizer",
-  "appName": "Reels Organizer",
+  "appName": "Sakla",
   "webDir": "www",
   "android": {
     "allowMixedContent": false,

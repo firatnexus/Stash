@@ -57,7 +57,7 @@ function render({ keepScroll = false } = {}) {
   const changed = currentRoute !== name;
   currentRoute = name;
   renderNav(name);
-  document.title = `${t(ROUTES[name].label)} · Reels Organizer`;
+  document.title = `${t(ROUTES[name].label)} · Sakla`;
   if (changed) {
     window.scrollTo(0, 0);
     main.focus({ preventScroll: true });
