@@ -42,10 +42,27 @@ public class ReelsBridgePlugin extends Plugin {
     private static JSObject pendingShare;
     private static ReelsBridgePlugin instance;
     private String pendingSaveText;
+    /** Set when the web layer has painted its first frame (splash hand-off). */
+    private static volatile boolean firstFrameReady = false;
+    private static final long LAUNCHED_AT = android.os.SystemClock.uptimeMillis();
+    /** Safety cap: never hold the splash longer than this, even if JS fails. */
+    private static final long MAX_SPLASH_MS = 3000;
+
+    /** True while the native splash should stay on screen (first frame + timeout guard). */
+    static boolean isFirstFrameReady() {
+        return firstFrameReady || (android.os.SystemClock.uptimeMillis() - LAUNCHED_AT) >= MAX_SPLASH_MS;
+    }
 
     @Override
     public void load() {
         instance = this;
+    }
+
+    /** Called by the web layer once its first frame is painted. */
+    @PluginMethod
+    public void markFirstFrame(PluginCall call) {
+        firstFrameReady = true;
+        call.resolve();
     }
 
     /** Called by MainActivity for launch and new intents. */

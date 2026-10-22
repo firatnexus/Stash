@@ -5,7 +5,7 @@ import * as store from './core/store.js';
 import { t, setLang, onLangChange } from './core/i18n.js';
 import { h, icon, toast, closeTopSheet, closeAllSheets, clear } from './ui/dom.js';
 import { applyTheme } from './ui/theme.js';
-import { takePendingShare, onShare, onBackButton, exitApp } from './core/platform.js';
+import { takePendingShare, onShare, onBackButton, exitApp, markFirstFrame } from './core/platform.js';
 import { renderDashboard } from './ui/views/dashboard.js';
 import { renderLibrary } from './ui/views/library.js';
 import { renderAdd, reportAddResult } from './ui/views/add.js';
@@ -149,6 +149,7 @@ async function boot() {
   applyTheme(store.state.settings.theme);
   render();
   document.body.classList.add('ready');
+  markFirstFrame(); // native splash can hand off now
 
   onShare(handleShare);
   const pending = await takePendingShare();

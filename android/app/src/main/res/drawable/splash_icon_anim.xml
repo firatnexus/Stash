@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Short entrance for the splash mark (under 1s): scale up with a gentle
+     overshoot. Falls back to a static icon where AVDs are not run (pre-12
+     compat splash just shows the vector). -->
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/splash_mark">
+    <target android:name="mark">
+        <set>
+            <objectAnimator
+                android:propertyName="scaleX"
+                android:valueFrom="0.55"
+                android:valueTo="1"
+                android:duration="450"
+                android:startOffset="60"
+                android:interpolator="@android:interpolator/overshoot" />
+            <objectAnimator
+                android:propertyName="scaleY"
+                android:valueFrom="0.55"
+                android:valueTo="1"
+                android:duration="450"
+                android:startOffset="60"
+                android:interpolator="@android:interpolator/overshoot" />
+        </set>
+    </target>
+</animated-vector>

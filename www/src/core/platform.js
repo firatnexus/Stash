@@ -161,6 +161,12 @@ export function setSystemBars(dark) {
 
 /* ------------------------------ Lifecycle -------------------------- */
 
+/** Tell the native layer its first frame is painted (releases the splash). */
+export function markFirstFrame() {
+  const b = bridge();
+  if (b) b.markFirstFrame().catch(() => {});
+}
+
 export function onBackButton(cb) {
   const app = appPlugin();
   if (app) app.addListener('backButton', cb);
