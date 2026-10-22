@@ -592,3 +592,12 @@ dialog.sheet.closing::backdrop { opacity: 0; transition: opacity 0.18s; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
+/* detail preview: the centered play badge collides with the preview buttons */
+.detail-preview .tile-kind { display: none; }
+/* detail preview: the fallback initial sits under the buttons — the username is shown below anyway */
+.detail-preview .tile-initial { display: none; }
+/* refresh-cover sits bottom-left, load-preview bottom-right — they used to stack */
+.detail-preview .preview-btn:has(+ .preview-btn) { left: var(--space-3); right: auto; }
+/* solid dark pills so the tile's fallback letter doesn't show through */
+.detail-preview .preview-btn { background: rgb(20 20 20 / 0.88); color: #fff; }
+.detail-preview .preview-btn:hover { background: rgb(20 20 20); color: #fff; }
