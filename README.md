@@ -1,10 +1,10 @@
 <div align="center">
 
-<img src="www/icons/icon.svg" width="88" alt="Reels Organizer simgesi" />
+<img src="www/icons/icon.svg" width="88" alt="Sakla simgesi" />
 
-# Reels Organizer
+# Sakla
 
-**Instagram'da kaydettiğin Reels'leri kendi kategorilerine ayıran, tamamen cihazında çalışan Android uygulaması.**
+**Instagram'da kaydettiğin Reels'leri kendi kategorilerine ayıran, tamamen cihazında çalışan Android uygulaması.** (Eski adı: Reels Organizer)
 
 [![CI](https://github.com/firatnexus/reels-organizer/actions/workflows/ci.yml/badge.svg)](https://github.com/firatnexus/reels-organizer/actions/workflows/ci.yml)
 [![Android APK](https://github.com/firatnexus/reels-organizer/actions/workflows/android.yml/badge.svg)](https://github.com/firatnexus/reels-organizer/actions/workflows/android.yml)
@@ -14,7 +14,7 @@
 
 [**APK'yı indir**](https://github.com/firatnexus/reels-organizer/releases/latest) · [Nasıl çalışır](#nasıl-çalışır) · [Instagram ile ne çalışır?](#instagram-ile-ne-çalışır-ne-çalışmaz) · [Geliştirme](#geliştirme) · [English](#english)
 
-<img src="docs/screenshots/overview.png" alt="Ana sayfa, kitaplık, kategori seçimi, kategoriler ve karanlık tema ekran görüntüleri" />
+<img src="docs/screenshots/light-home.png" width="236" alt="Ana sayfa" /><img src="docs/screenshots/light-library.png" width="236" alt="Kitaplık" /><img src="docs/screenshots/light-pick.png" width="236" alt="Kategori seçimi ve etiket önerileri" /><img src="docs/screenshots/dark-detail.png" width="236" alt="Ayrıntı sayfası, karanlık tema" />
 
 </div>
 
@@ -22,16 +22,21 @@
 
 ## Özellikler
 
-- **Instagram'dan paylaş → kaydet.** Instagram'da bir Reel'de *Paylaş → Reels Organizer*'a dokun; bağlantı kaydedilir ve kategoriye ayrılır.
+- **Instagram'dan paylaş → kaydet.** Instagram'da bir Reel'de *Paylaş → Sakla'ya kaydet*'e dokun; bağlantı kaydedilir ve kategoriye ayrılır.
 - **Bağlantı yapıştır.** Tek bağlantı ya da her satıra bir tane olacak şekilde toplu ekleme. Panodan tek dokunuşla yapıştırma.
 - **Instagram veri dışa aktarımını içe al.** Instagram'ın "Bilgilerini indir" ZIP/JSON/HTML dosyasındaki kaydedilenleri tek seferde ekler. Instagram koleksiyonlarını kategori olarak alabilir.
 - **Kendi kategorilerin.** Oluştur, yeniden adlandır, renk ve anahtar kelime ver, sil. Tarifler, Oyun Fikirleri, Teknoloji, Seyahat, Komik Videolar, Öğrenme gibi hazır öneriler TR/EN anahtar kelimelerle gelir.
 - **Güvenilir otomatik kategori.** Anahtar kelime, hashtag, Instagram koleksiyonu ve senin önceki seçimlerine (aynı paylaşan) göre puanlar. Emin değilse **sana sorar**; tahmin uydurmaz.
 - **İsteğe bağlı yapay zekâ.** OpenAI, Gemini, OpenRouter, Anthropic ya da OpenAI uyumlu herhangi bir uç nokta. Yalnızca sen açarsan ve yalnızca anahtar kelimelerin ayıramadığı, metni olan Reels için kullanılır.
-- **Hızlı bulma.** Açıklama, paylaşan, not ve kategori adında arama (Türkçe karakterlere duyarsız: `sarki` → "şarkı"), kategori filtreleri, en yeni/en eski sıralama.
+- **Kapak resimleri.** Kayıt sırasında Instagram'ın herkese açık embed sayfasından kapak ve paylaşan bilgisi çekilir, ≤480px WebP olarak cihazda saklanır. Kapak gelmezse "Kapak yenile" ile tekrar denenebilir; Ayarlar'da önbellek boyutu ve temizleme var. Mevcut kayıtlar için tek seferlik "Mevcut reelleri güncelle" düğmesi.
+- **Etiketler.** Elle eklenir veya AI önerisiyle önerilir (3-5 etiket, dokunarak onaylanır, asla otomatik uygulanmaz). Kitaplıkta etiket çipleri ve etiketle arama.
+- **Ana sayfa / Kitaplık ayrımı.** Ana sayfa: hızlı ekleme, istatistikler, "Bugün tekrar bak" (eski bir Reel), kategori bekleyenler. Kitaplık: tüm koleksiyon — arama, sıralama, kategori/etiket filtreleri, liste/ızgara görünümü, çoklu seçimle toplu kategorileme/silme.
+- **Hızlı bulma.** Açıklama, paylaşan, not, etiket ve kategori adında arama (Türkçe karakterlere duyarsız: `sarki` → "şarkı"), kategori filtreleri, en yeni/en eski sıralama.
 - **Kopya kontrolü.** `instagram.com/reel/…`, `/reels/…`, `m.instagram.com`, `?igsh=` gibi farklı biçimler aynı Reel olarak tanınır.
 - **Yedekle / geri yükle.** Tüm kitaplığı JSON olarak dışa aktar; birleştirerek ya da tamamen değiştirerek geri yükle.
 - **Yerel ve özel.** Hesap yok, sunucu yok, analitik yok. Veriler IndexedDB'de, cihazında kalır. Android bulut yedeğine de gönderilmez.
+- **Native hissiyat.** Açılışta animasyonlu karşılama ekranı (beyaz parlama yok), aşağı kaydırarak kapanan alt sayfalar, dokunma titreşimi (haptic), basınç efektli düğmeler.
+- **Pano önerisi.** Uygulama ön plana geldiğinde panoda kaydedilmemiş bir Instagram bağlantısı varsa net bir istemle sunulur; hiçbir şey sen dokunmadan eklenmez.
 - Türkçe / İngilizce arayüz, açık/koyu tema, Android geri tuşu desteği, tamamen çevrimdışı açılış (fontlar dahil her şey APK içinde).
 
 ## Kurulum (APK)
@@ -39,7 +44,7 @@
 1. Telefonundan [son sürüm sayfasını](https://github.com/firatnexus/reels-organizer/releases/latest) aç ve `reels-organizer-x.y.z.apk` dosyasını indir.
 2. Dosyayı aç. Android "bilinmeyen uygulamaları yükleme" izni isterse tarayıcın (ya da dosya yöneticin) için **bu kaynağa izin ver**'i aç.
 3. **Yükle**'ye dokun, ardından uygulamayı aç.
-4. Instagram'da bir Reel'de **Paylaş** (kâğıt uçak) → **Diğer / Şuraya paylaş…** → **Reels Organizer**. İlk seferde listede en sona düşebilir; uzun basıp sabitleyebilirsin.
+4. Instagram'da bir Reel'de **Paylaş** (kâğıt uçak) → **Diğer / Şuraya paylaş…** → **Sakla'ya kaydet**. İlk seferde listede en sona düşebilir; uzun basıp sabitleyebilirsin.
 
 > Android 6.0 ve üzeri, güncel bir **Android System WebView** (Chrome 111+) gerekir; Play Store üzerinden otomatik güncellenir.
 >
@@ -58,6 +63,7 @@ Bağlantı yapıştır / toplu ekle / dışa aktarım dosyası ─────�
                      categorize/engine ─▶ anahtar kelime + koleksiyon + paylaşan geçmişi
                                          (emin değilse) ─▶ isteğe bağlı yapay zekâ
                                          (hâlâ emin değilse) ─▶ kullanıcıya sor
+                     instagram/embed  ─▶ herkese açık embed sayfasından kapak/paylaşan/etiket ( başarısızsa sessizce atlanır)
                      storage/repo.js   ─▶ IndexedDB (reels, categories, settings)
 ```
 
@@ -75,7 +81,7 @@ Bağlantı yapıştır / toplu ekle / dışa aktarım dosyası ─────�
 
 En iyi puan **≥ 1** ve ikincinin **en az 2 katı** ise Reel otomatik eklenir. Değilse "Kategori bekleyenler"e düşer ve önerilerle birlikte seçmen istenir. Metin yoksa (örneğin sadece bağlantı paylaşıldıysa) uygulama açıklama uydurmaz; seçimi sana bırakır ya da açıklamayı yapıştırmanı önerir.
 
-Yapay zekâ açıksa: yalnızca yerel sonuç *emin değilse* ve Reel'in gerçek bir metni varsa çağrılır. Model yalnızca senin kategori adlarından birini döndürebilir; güven ≥ 0.6 ise otomatik eklenir, altındaysa sadece öneri olur.
+Yapay zekâ açıksa: yalnızca yerel sonuç *emin değilse* ve Reel'in gerçek bir metni varsa çağrılır. Model en fazla 3 mevcut kategori ve en fazla 1 yeni kategori önerir; güven ≥ 0.6 ise otomatik eklenir, altındaysa sadece öneri olur. Ayrıca 3-5 etiket önerir — bunlar asla otomatik uygulanmaz, dokunarak onaylanır ("Hepsini reddet" ile tümü reddedilir). Ayarlar'da ne gönderildiği yazar (yalnızca Reel metni ve kategori adları) ve öneriler tamamen kapatılabilir.
 
 ## Instagram ile ne çalışır, ne çalışmaz?
 
@@ -83,14 +89,14 @@ Bu uygulama Instagram'a **giriş yapmaz**, şifre veya çerez istemez, sayfalar�
 
 | Özellik | Durum | Neye bağlı |
 | --- | --- | --- |
-| Instagram'dan *Paylaş → Reels Organizer* | ✅ Çalışır | Android paylaşım menüsü (`ACTION_SEND text/plain`). Instagram yalnızca **bağlantıyı** paylaşır. |
+| Instagram'dan *Paylaş → Sakla'ya kaydet* | ✅ Çalışır | Android paylaşım menüsü (`ACTION_SEND text/plain`). Instagram yalnızca **bağlantıyı** paylaşır. |
 | Bağlantı yapıştırma, toplu ekleme, panodan yapıştırma | ✅ Çalışır, çevrimdışı | — |
 | Instagram veri dışa aktarımından toplu içe aktarma | ✅ Çalışır, çevrimdışı | Instagram'ın dışa aktarım biçimi (`your_instagram_activity/saved/saved_posts.json`, `saved_collections.json`). Meta biçimi değiştirirse ayrıştırıcının güncellenmesi gerekebilir. |
 | Kopya algılama | ✅ Çalışır | Kısa kod içeren bağlantılarda tam. Yeni `instagram.com/share/…` bağlantıları çevrimdışı çözülemez; bunlarda yalnızca aynı paylaşım bağlantısı tekrar edilirse yakalanır. |
 | "Instagram'da aç" | ✅ Çalışır | Instagram uygulaması yüklüyse orada, değilse tarayıcıda açılır (internet gerekir). |
-| Paylaşan kullanıcı adı | ⚠️ Bazen | Yalnızca bağlantıda (`/kullanici/reel/…`), paylaşılan metinde veya dışa aktarımda varsa. |
-| Açıklama (caption) | ⚠️ Elle | Instagram paylaşırken açıklamayı göndermez. Açıklamayı kopyalayıp yapıştırabilirsin; arama ve otomatik kategori bunu kullanır. |
-| Küçük resim | ❌ Yok | Meta, 3 Kasım 2025'ten itibaren oEmbed yanıtlarından `thumbnail_url` ve `author_name` alanlarını kaldırdı. Bunun yerine kategori renginde bir kart gösterilir; istersen Reel ayrıntılarında Instagram'ın resmi gömülü görünümünü yükleyebilirsin. |
+| Paylaşan kullanıcı adı | ✅ Çoğunlukla | Kayıt sırasında herkese açık embed sayfasından çekilir ve saklanır; gelmezse bağlantıdaki, paylaşılan metindeki veya dışa aktarımdaki bilgi kullanılır. |
+| Açıklama (caption) | ✅ Çoğunlukla | Kayıt sırasında embed sayfasından çekilir. Instagram paylaşırken açıklamayı göndermez; gelmezse elle yapıştırabilirsin. |
+| Küçük resim | ✅ Kayıt sırasında | Meta oEmbed yanıtlarından `thumbnail_url` alanını kaldırdığı için herkese açık embed sayfası kullanılır; kapak ≤480px WebP olarak cihazda saklanır. Gizli/kaldırılmış içerikte gelmez — "Kapak yenile" ile tekrar denenebilir. |
 | Kaydedilenleri Instagram'dan otomatik çekme | ❌ Yok | Instagram'ın resmi API'si kişisel hesaplarda kaydedilenleri vermez. Bunu yapan araçlar şifre/çerez kullanır; bu uygulama kullanmaz. Toplu aktarım için **veri dışa aktarımını** kullan. |
 
 ### Instagram veri dışa aktarımı nasıl alınır
@@ -189,14 +195,17 @@ Gerçek bir Android cihazdaki paylaşım menüsü ve Instagram uygulamasına ge�
 
 ## English
 
-**Reels Organizer** is a local-first Android app (Capacitor 7) for sorting the Instagram Reels you save into your own categories.
+**Sakla** (formerly **Reels Organizer**) is a local-first Android app (Capacitor 7) for sorting the Instagram Reels you save into your own categories.
 
 - Share a Reel from Instagram to the app, paste links (one or many), or import Instagram's "Download your information" export (ZIP/JSON/HTML, including collections).
-- Categories you control, with keyword, hashtag, collection and creator-history matching. When a match is uncertain, the app **asks you**. An optional AI provider (OpenAI-compatible or Anthropic) can be enabled with your own API key.
-- Search, category filters, newest/oldest sort, duplicate detection, JSON backup/restore, Turkish/English UI, light/dark theme.
+- Categories you control, with keyword, hashtag, collection and creator-history matching. When a match is uncertain, the app **asks you**. An optional AI provider (OpenAI-compatible or Anthropic) can be enabled with your own API key; it also suggests 3-5 tags, which are never auto-applied.
+- Cover images and the sharer's username are downloaded at save time from Instagram's public embed page and stored locally as small WebP files (with a "refresh cover" retry and a one-time backfill for existing reels).
+- Home is a compact dashboard (quick add, stats, pending quick-categorize, a daily "take another look" pick); the Library holds the full collection with search, sort, category/tag filters, grid/list toggle and multi-select bulk actions.
+- Search across caption, sharer, notes, tags and category names, duplicate detection, JSON backup/restore, Turkish/English UI, light/dark theme.
+- Native splash screen, swipe-down-to-close sheets, tactile buttons with haptics, and a foreground-only clipboard offer (nothing is added without your tap).
 - No account, no server, no Instagram login. It never asks for passwords or reads cookies. Data stays in IndexedDB on the device, and Android cloud backup is disabled.
 
-**What depends on Instagram:** Instagram's share action only sends the link, so captions are added manually. Thumbnails are not available because Meta removed `thumbnail_url`/`author_name` from oEmbed on Nov 3, 2025. The official API cannot list a personal account's saved posts, so bulk import uses the data export instead.
+**What depends on Instagram:** Meta removed `thumbnail_url`/`author_name` from oEmbed responses (Nov 3, 2025), so covers are fetched from the public embed page instead; private or removed reels get no cover. The official API cannot list a personal account's saved posts, so bulk import uses the data export instead.
 
 Install: download the APK from [Releases](https://github.com/firatnexus/reels-organizer/releases/latest) and allow installing from that source. Build: `npm install && npm run apk:debug`. Tests: `npm test && npm run test:e2e`.
 
