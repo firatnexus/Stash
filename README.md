@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="www/icons/icon.svg" width="88" alt="Sakla simgesi" />
+<img src="www/icons/icon.svg" width="88" alt="Stash simgesi" />
 
-# Sakla
+# Stash
 
 **Instagram'da kaydettiğin Reels'leri kendi kategorilerine ayıran, tamamen cihazında çalışan Android uygulaması.** (Eski adı: Reels Organizer)
 
@@ -24,7 +24,7 @@
 
 ## Özellikler
 
-- **Instagram'dan paylaş → kaydet.** Instagram'da bir Reel'de *Paylaş → Sakla'ya kaydet*'e dokun; bağlantı kaydedilir ve kategoriye ayrılır.
+- **Instagram'dan paylaş → kaydet.** Instagram'da bir Reel'de *Paylaş → Stash'e kaydet*'e dokun; bağlantı kaydedilir ve kategoriye ayrılır.
 - **Bağlantı yapıştır.** Tek bağlantı ya da her satıra bir tane olacak şekilde toplu ekleme. Panodan tek dokunuşla yapıştırma.
 - **Instagram veri dışa aktarımını içe al.** Instagram'ın "Bilgilerini indir" ZIP/JSON/HTML dosyasındaki kaydedilenleri tek seferde ekler. Instagram koleksiyonlarını kategori olarak alabilir.
 - **Kendi kategorilerin.** Oluştur, yeniden adlandır, renk ve anahtar kelime ver, sil. Tarifler, Oyun Fikirleri, Teknoloji, Seyahat, Komik Videolar, Öğrenme gibi hazır öneriler TR/EN anahtar kelimelerle gelir.
@@ -46,7 +46,7 @@
 1. Telefonundan [son sürüm sayfasını](https://github.com/firatnexus/reels-organizer/releases/latest) aç ve `reels-organizer-x.y.z.apk` dosyasını indir.
 2. Dosyayı aç. Android "bilinmeyen uygulamaları yükleme" izni isterse tarayıcın (ya da dosya yöneticin) için **bu kaynağa izin ver**'i aç.
 3. **Yükle**'ye dokun, ardından uygulamayı aç.
-4. Instagram'da bir Reel'de **Paylaş** (kâğıt uçak) → **Diğer / Şuraya paylaş…** → **Sakla'ya kaydet**. İlk seferde listede en sona düşebilir; uzun basıp sabitleyebilirsin.
+4. Instagram'da bir Reel'de **Paylaş** (kâğıt uçak) → **Diğer / Şuraya paylaş…** → **Stash'e kaydet**. İlk seferde listede en sona düşebilir; uzun basıp sabitleyebilirsin.
 
 > Android 6.0 ve üzeri, güncel bir **Android System WebView** (Chrome 111+) gerekir; Play Store üzerinden otomatik güncellenir.
 >
@@ -91,7 +91,7 @@ Bu uygulama Instagram'a **giriş yapmaz**, şifre veya çerez istemez, sayfalar�
 
 | Özellik | Durum | Neye bağlı |
 | --- | --- | --- |
-| Instagram'dan *Paylaş → Sakla'ya kaydet* | ✅ Çalışır | Android paylaşım menüsü (`ACTION_SEND text/plain`). Instagram yalnızca **bağlantıyı** paylaşır. |
+| Instagram'dan *Paylaş → Stash'e kaydet* | ✅ Çalışır | Android paylaşım menüsü (`ACTION_SEND text/plain`). Instagram yalnızca **bağlantıyı** paylaşır. |
 | Bağlantı yapıştırma, toplu ekleme, panodan yapıştırma | ✅ Çalışır, çevrimdışı | — |
 | Instagram veri dışa aktarımından toplu içe aktarma | ✅ Çalışır, çevrimdışı | Instagram'ın dışa aktarım biçimi (`your_instagram_activity/saved/saved_posts.json`, `saved_collections.json`). Meta biçimi değiştirirse ayrıştırıcının güncellenmesi gerekebilir. |
 | Kopya algılama | ✅ Çalışır | Kısa kod içeren bağlantılarda tam. Yeni `instagram.com/share/…` bağlantıları çevrimdışı çözülemez; bunlarda yalnızca aynı paylaşım bağlantısı tekrar edilirse yakalanır. |
@@ -197,7 +197,7 @@ Gerçek bir Android cihazdaki paylaşım menüsü ve Instagram uygulamasına ge�
 
 ## English
 
-**Sakla** (formerly **Reels Organizer**) is a local-first Android app (Capacitor 7) for sorting the Instagram Reels you save into your own categories.
+**Stash** (formerly **Reels Organizer**) is a local-first Android app (Capacitor 7) for sorting the Instagram Reels you save into your own categories.
 
 - Share a Reel from Instagram to the app, paste links (one or many), or import Instagram's "Download your information" export (ZIP/JSON/HTML, including collections).
 - Categories you control, with keyword, hashtag, collection and creator-history matching. When a match is uncertain, the app **asks you**. An optional AI provider (OpenAI-compatible or Anthropic) can be enabled with your own API key; it also suggests 3-5 tags, which are never auto-applied.

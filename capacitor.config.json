@@ -1,6 +1,6 @@
 {
   "appId": "io.github.firatnexus.reelsorganizer",
-  "appName": "Sakla",
+  "appName": "Stash",
   "webDir": "www",
   "android": {
     "allowMixedContent": false,

@@ -697,7 +697,15 @@ export function categoryEditorSheet(categoryId = null) {
             save();
           }
         });
-        setTimeout(() => name.focus(), 50);
+        // Auto-focus the name field shortly after the sheet opens — but never
+        // steal focus from an input the user (or an automation filling the
+        // keyword field) has already focused: a late focus() here used to
+        // redirect typed text into the name field ("Recipespasta" flake).
+        setTimeout(() => {
+          const ae = document.activeElement;
+          const typing = ae && /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName);
+          if (!typing) name.focus();
+        }, 50);
       },
     });
   });

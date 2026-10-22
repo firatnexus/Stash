@@ -14,6 +14,10 @@
 - JSON yedek dışa aktarma ve birleştirerek / değiştirerek geri yükleme.
 - Türkçe / İngilizce arayüz, açık / koyu tema, Android geri tuşu, uyarlanabilir ve tematik uygulama simgesi.
 
+## 1.1.1 — 2026-10-22 (Stash)
+
+Renamed to **Stash** (English name; was Sakla in 1.1.0, formerly Reels Organizer). All app-name strings, the share-target label and the release page are now in English. `applicationId` unchanged — installs over existing versions.
+
 ## 1.1.0 — 2026-10-22 (Sakla)
 
 Yeni ad: **Sakla** (eski adı Reels Organizer). `applicationId` değişmedi — mevcut kurulumların üzerine yüklenebilir.
