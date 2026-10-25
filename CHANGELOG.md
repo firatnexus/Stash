@@ -1,6 +1,6 @@
 # Değişiklik günlüğü
 
-## Yayınlanmadı
+## 1.2.0 — 2026-10-25
 
 ElevenLabs esintili editoryal tasarım yenilemesi (marka vurgusu yok; işlevsellik ve veri modeli değişmedi).
 
