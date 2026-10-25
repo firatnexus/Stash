@@ -2,6 +2,7 @@ package io.github.firatnexus.reelsorganizer;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.webkit.WebView;
 
 import androidx.core.splashscreen.SplashScreen;
 
@@ -19,6 +20,17 @@ public class MainActivity extends BridgeActivity {
         splashScreen.setKeepOnScreenCondition(() -> !ReelsBridgePlugin.isFirstFrameReady());
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null) ReelsBridgePlugin.handleIntent(getIntent());
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // The Android WebView can draw its own vertical scrollbar overlay while
+        // the page is scrolled. Hide just that built-in indicator — touch
+        // scrolling, inner scrollable areas and the horizontal scrollbar are
+        // unaffected.
+        WebView wv = getBridge() == null ? null : getBridge().getWebView();
+        if (wv != null) wv.setVerticalScrollBarEnabled(false);
     }
 
     @Override
