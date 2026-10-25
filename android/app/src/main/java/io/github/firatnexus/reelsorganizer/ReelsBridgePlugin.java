@@ -198,7 +198,7 @@ public class ReelsBridgePlugin extends Plugin {
         final boolean dark = Boolean.TRUE.equals(call.getBoolean("dark", false));
         getActivity().runOnUiThread(() -> {
             Window w = getActivity().getWindow();
-            int bg = dark ? Color.parseColor("#141213") : Color.parseColor("#F7F3EF");
+            int bg = dark ? Color.parseColor("#0c0a09") : Color.parseColor("#F5F5F5");
             w.setStatusBarColor(bg);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) w.setNavigationBarColor(bg);
             View decor = w.getDecorView();
