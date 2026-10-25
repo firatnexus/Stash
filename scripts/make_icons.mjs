@@ -32,7 +32,7 @@ for (const dir of readdirSync(RES).filter((n) => n.startsWith('drawable'))) {
   if (!existsSync(f)) continue;
   const [w, h] = sizeOf(readFileSync(f));
   const m = Math.round(Math.min(w, h) * 0.28);
-  await render(f, w, h, `<div style="width:100%;height:100%;display:grid;place-items:center;background:#F7F3EF">${img(m)}</div>`);
+  await render(f, w, h, `<div style="width:100%;height:100%;display:grid;place-items:center;background:#F5F5F5">${img(m)}</div>`);
 }
 
 // Web icons

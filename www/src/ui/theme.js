@@ -8,7 +8,7 @@ export function applyTheme(mode = 'system') {
   const dark = mode === 'dark' || (mode === 'system' && mq && mq.matches);
   document.documentElement.dataset.theme = dark ? 'dark' : 'light';
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', dark ? '#151314' : '#f7f3ef');
+  if (meta) meta.setAttribute('content', dark ? '#0c0a09' : '#f5f5f5');
   setSystemBars(dark);
 }
 
