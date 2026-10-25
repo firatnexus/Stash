@@ -93,7 +93,6 @@
   --shadow: 0 8px 24px rgb(0 0 0 / 0.4);
   --shadow-lg: 0 12px 48px rgb(0 0 0 / 0.6);
   --scrim: rgb(0 0 0 / 0.6);
-  --switch-thumb: #0c0a09;
   color-scheme: dark;
 }
 
@@ -330,9 +329,9 @@ select.input { appearance: none; -webkit-appearance: none; padding-right: var(--
 .switch { position: relative; display: inline-flex; flex-shrink: 0; }
 .switch input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
 .switch-ui { width: 46px; height: 28px; border-radius: var(--radius-full); background: var(--surface-3); position: relative; transition: background 0.2s; }
-.switch-ui::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--switch-thumb, #fff); box-shadow: 0 1px 3px rgb(0 0 0 / 0.25); transition: transform 0.2s var(--ease); }
+.switch-ui::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgb(0 0 0 / 0.25); transition: transform 0.2s var(--ease); }
 .switch input:checked + .switch-ui { background: var(--primary); }
-.switch input:checked + .switch-ui::after { transform: translateX(18px); }
+.switch input:checked + .switch-ui::after { background: var(--primary-ink); transform: translateX(18px); }
 .switch input:focus-visible + .switch-ui { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 /* Chips */
@@ -644,8 +643,9 @@ dialog.sheet.closing::backdrop { opacity: 0; transition: opacity 0.18s; }
 .detail-preview .tile-kind { display: none; }
 /* detail preview: the fallback initial sits under the buttons — the username is shown below anyway */
 .detail-preview .tile-initial { display: none; }
-/* refresh-cover sits bottom-left, load-preview bottom-right — they used to stack */
-.detail-preview .preview-btn:has(+ .preview-btn) { left: var(--space-3); right: auto; }
+/* refresh-cover sits bottom-left, load-preview bottom-right — with long
+   (Turkish) labels the two pills collide, so refresh-cover stacks above */
+.detail-preview .preview-btn:has(+ .preview-btn) { left: var(--space-3); right: auto; bottom: calc(var(--space-3) + 42px); }
 /* solid dark pills so the tile's fallback letter doesn't show through */
 .detail-preview .preview-btn { background: rgb(20 20 20 / 0.88); color: #fff; }
 .detail-preview .preview-btn:hover { background: rgb(20 20 20); color: #fff; }
