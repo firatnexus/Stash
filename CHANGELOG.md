@@ -2,6 +2,20 @@
 
 All notable changes to Stash. Newest first. Each `## X.Y.Z — date` section is published as the GitHub release notes for that version only.
 
+## 1.2.2 — 2026-10-28
+
+The last internal "Reels Organizer" names are gone. Your library moves over automatically.
+
+### Changed
+
+- **Database renamed** from `reels-organizer` to `stash`. On first launch every Reel, category and setting is copied into the new database; the old one is deleted only after the copy has been saved, so an interrupted update simply finishes on the next launch. Nothing you added in the meantime is overwritten.
+- **Backups** are now named `stash-backup-YYYY-MM-DD.json` and marked `"app": "stash"`. Backups made by earlier versions still restore.
+- **Android code** moved to the `io.github.firatnexus.stash` package. The launcher icon and the "Save to Stash" share target keep their previous component name, so home-screen shortcuts and pinned share targets keep working.
+
+### Unchanged on purpose
+
+- The Android `applicationId` stays `io.github.firatnexus.reelsorganizer`. Changing it would make Android treat Stash as a different app: updates would not install over the old version and your data would stay behind.
+
 ## 1.2.1 — 2026-10-28
 
 A small polish release with an all-English repository.

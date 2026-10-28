@@ -85,7 +85,7 @@ await page.evaluate(
           updatedAt: 1,
         });
       }
-      const req = indexedDB.open('reels-organizer', 1);
+      const req = indexedDB.open('stash', 1);
       req.onupgradeneeded = () => {
         const db = req.result;
         if (!db.objectStoreNames.contains('reels')) {

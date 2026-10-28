@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">Stash</string>
     <string name="title_activity_main">Stash</string>
+    <!-- Must equal the applicationId, which stays io.github.firatnexus.reelsorganizer so updates keep user data. -->
     <string name="package_name">io.github.firatnexus.reelsorganizer</string>
     <string name="custom_url_scheme">io.github.firatnexus.reelsorganizer</string>
     <string name="share_label">Save to Stash</string>

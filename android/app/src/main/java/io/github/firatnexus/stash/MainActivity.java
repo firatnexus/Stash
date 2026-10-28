@@ -1,4 +1,4 @@
-package io.github.firatnexus.reelsorganizer;
+package io.github.firatnexus.stash;
 
 import android.content.Intent;
 import android.os.Bundle;

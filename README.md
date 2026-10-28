@@ -84,7 +84,7 @@ Instagram's own "Saved" tab is one long, unsorted list. Stash gives every Reel y
 - **Native touches.** Animated splash screen with no white flash, swipe-down-to-close sheets, haptics and pressable buttons.
 - **Editorial design.** EB Garamond headings, Inter body text, soft pastel orbs, pill buttons and a matching dark theme.
 - **Turkish and English UI**, light and dark theme, Android back button support and a fully offline launch (fonts included in the APK).
-- **Backup and restore.** Export the whole library as JSON; restore by merging or replacing.
+- **Backup and restore.** Export the whole library as JSON (`stash-backup-YYYY-MM-DD.json`); restore by merging or replacing. Backups from older versions still restore.
 
 ## Install
 
@@ -222,7 +222,7 @@ www/                        web layer that Capacitor packages into the APK (no b
    ├─ core/                 store (app state) · platform (native bridge) · i18n
    └─ ui/                   DOM helpers · components · theme · views/
 android/                    Capacitor 7 Android project
-└─ app/src/main/java/…/ReelsBridgePlugin.java   share intake, open in Instagram, file save, clipboard, system bars
+└─ app/src/main/java/io/github/firatnexus/stash/ReelsBridgePlugin.java   share intake, open in Instagram, file save, clipboard, system bars
 tests/unit/                 node:test + fake-indexeddb
 tests/e2e/                  Playwright: core workflows + data export import
 scripts/                    serve · vendor · make_icons · release-notes · perf/ (screenshots, scroll profiling)
@@ -245,6 +245,7 @@ scripts/                    serve · vendor · make_icons · release-notes · pe
 | Instagram ZIP import, mojibake repair, collections | `instagram-export.test`, `e2e` |
 | Cover and creator parsing from the embed page | `embed.test` |
 | Turkish and English translation keys are complete | `i18n.test` |
+| Upgrading from the legacy `reels-organizer` database | `db-migration.test` |
 | Release notes contain only the current version | `release-notes.test` |
 
 The real Android share sheet and the hand-off to the Instagram app are simulated in automated tests; verify them by hand on a device.
@@ -260,13 +261,14 @@ The real Android share sheet and the hand-off to the Instagram app are simulated
 
 | Version | Date | Highlights |
 | --- | --- | --- |
-| **1.2.1** | 2026-10-28 | Hidden WebView scrollbar, English docs, per-version release notes |
+| **1.2.2** | 2026-10-28 | Internal names renamed to Stash with automatic data migration |
+| 1.2.1 | 2026-10-28 | Hidden WebView scrollbar, English docs, per-version release notes |
 | 1.2.0 | 2026-10-25 | Editorial design refresh: EB Garamond + Inter, pastel orbs, pill buttons |
 | 1.1.1 | 2026-10-22 | Renamed to Stash |
 | 1.1.0 | 2026-10-22 | Covers, tags, Home / Library split, splash screen, AI tag suggestions |
 | 1.0.0 | 2026-10-22 | First release |
 
-Full details in [CHANGELOG.md](CHANGELOG.md). Stash was formerly called **Reels Organizer**; the `applicationId` is unchanged, so every version installs over the previous one.
+Full details in [CHANGELOG.md](CHANGELOG.md). Stash was formerly called **Reels Organizer**. The `applicationId` (`io.github.firatnexus.reelsorganizer`) is deliberately unchanged, so every version installs over the previous one; since 1.2.2 everything else uses the Stash name, and data from the old `reels-organizer` database and backups is migrated automatically.
 
 ## License
 

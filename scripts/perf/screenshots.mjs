@@ -118,7 +118,7 @@ async function seedAndGo(hash, theme = 'light') {
   await phone.evaluate(
     ({ cats, data, theme, lang }) =>
       new Promise((resolve, reject) => {
-        const req = indexedDB.open('reels-organizer', 1);
+        const req = indexedDB.open('stash', 1);
         req.onupgradeneeded = () => {
           const db = req.result;
           if (!db.objectStoreNames.contains('reels')) {

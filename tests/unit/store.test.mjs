@@ -125,7 +125,7 @@ test('backup export → wipe → restore (replace) round-trips everything except
   const backup = JSON.parse(JSON.stringify(store.makeBackup()));
   assert.equal(backup.settings.ai.apiKey, '');
   assert.equal(backup.reels.length, 1);
-  assert.match(backupFileName(new Date(2026, 0, 5)), /reels-organizer-backup-2026-01-05\.json/);
+  assert.match(backupFileName(new Date(2026, 0, 5)), /stash-backup-2026-01-05\.json/);
 
   await store.wipeAll();
   assert.equal(store.state.reels.length, 0);
@@ -141,7 +141,7 @@ test('backup merge reuses categories by name and skips existing reels', async ()
   const c = await store.createCategory({ name: 'Travel' });
   await store.addFromText({ text: REEL, categoryId: c.id });
   const incoming = {
-    app: 'reels-organizer', schemaVersion: 1,
+    app: 'stash', schemaVersion: 1,
     categories: [{ id: 'other-id', name: 'travel' }, { id: 'n2', name: 'Funny' }],
     reels: [
       { url: REEL, categoryId: 'other-id' },
@@ -158,8 +158,9 @@ test('backup merge reuses categories by name and skips existing reels', async ()
 test('backup validation errors', () => {
   assert.throws(() => validateBackup(null), (e) => e instanceof BackupError && e.code === 'invalid');
   assert.throws(() => validateBackup({ app: 'other' }), (e) => e.code === 'wrong_app');
-  assert.throws(() => validateBackup({ app: 'reels-organizer', schemaVersion: 99, reels: [], categories: [] }), (e) => e.code === 'newer_schema');
-  assert.throws(() => validateBackup({ app: 'reels-organizer', schemaVersion: 1, reels: 'x', categories: [] }), (e) => e.code === 'invalid');
+  assert.throws(() => validateBackup({ app: 'stash', schemaVersion: 99, reels: [], categories: [] }), (e) => e.code === 'newer_schema');
+  assert.throws(() => validateBackup({ app: 'stash', schemaVersion: 1, reels: 'x', categories: [] }), (e) => e.code === 'invalid');
+  // backups made before 1.2.2 (app: 'reels-organizer') still restore
   const v = validateBackup({ app: 'reels-organizer', schemaVersion: 1, categories: [{ id: 'a', name: 'A' }], reels: [{ url: REEL, categoryId: 'missing' }, { url: REEL }] });
   assert.equal(v.reels.length, 1);
   assert.equal(v.skipped, 1);
