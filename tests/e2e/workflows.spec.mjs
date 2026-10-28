@@ -150,11 +150,11 @@ test('6 · export a backup and restore it', async ({ page }, info) => {
   }, REEL);
   await nav(page, 'settings');
   const [download] = await Promise.all([page.waitForEvent('download'), page.getByTestId('backup-export').click()]);
-  expect(download.suggestedFilename()).toMatch(/^reels-organizer-backup-\d{4}-\d{2}-\d{2}\.json$/);
+  expect(download.suggestedFilename()).toMatch(/^stash-backup-\d{4}-\d{2}-\d{2}\.json$/);
   const file = info.outputPath('backup.json');
   await download.saveAs(file);
   const json = JSON.parse(readFileSync(file, 'utf8'));
-  expect(json.app).toBe('reels-organizer');
+  expect(json.app).toBe('stash');
   expect(json.reels).toHaveLength(1);
 
   // wipe everything
@@ -271,4 +271,52 @@ test('Instagram data export import (ZIP)', async ({ page }) => {
   await nav(page, 'library');
   await expect(page.getByTestId('reel-card')).toHaveCount(2);
   await expect(page.getByTestId('reel-card').filter({ hasText: 'chef.anna' })).toContainText('Desserts');
+});
+
+test('upgrade from the legacy reels-organizer database keeps the library', async ({ page }) => {
+  await ready(page);
+  await page.evaluate(async (url) => {
+    const s = globalThis.__reels.store;
+    const c = await s.createCategory({ name: 'Recipes', keywords: ['pasta'] });
+    await s.addFromText({ text: url, caption: 'Creamy pasta', categoryId: c.id });
+    await s.setSetting('theme', 'dark');
+  }, REEL);
+  // Leave the app (closing its connection) and turn the data into a pre-1.2.2
+  // install: everything in 'reels-organizer', no 'stash' database.
+  await page.goto('/icons/icon.svg');
+  await page.evaluate(async () => {
+    const open = (name, v, up) => new Promise((res, rej) => {
+      const r = v ? indexedDB.open(name, v) : indexedDB.open(name);
+      if (up) r.onupgradeneeded = () => up(r.result);
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+    const done = (t) => new Promise((res, rej) => { t.oncomplete = res; t.onerror = () => rej(t.error); });
+    const stores = ['reels', 'categories', 'settings'];
+    const src = await open('stash');
+    const data = {};
+    for (const st of stores) {
+      data[st] = await new Promise((res) => { const q = src.transaction([st]).objectStore(st).getAll(); q.onsuccess = () => res(q.result); });
+    }
+    src.close();
+    const dst = await open('reels-organizer', 1, (db) => {
+      const s = db.createObjectStore('reels', { keyPath: 'id' });
+      s.createIndex('key', 'key', { unique: true });
+      s.createIndex('addedAt', 'addedAt');
+      s.createIndex('categoryId', 'categoryId');
+      db.createObjectStore('categories', { keyPath: 'id' });
+      db.createObjectStore('settings', { keyPath: 'key' });
+    });
+    const t = dst.transaction(stores, 'readwrite');
+    for (const st of stores) data[st].forEach((x) => t.objectStore(st).put(x));
+    await done(t);
+    dst.close();
+    await new Promise((res) => { const d = indexedDB.deleteDatabase('stash'); d.onsuccess = d.onerror = res; });
+  });
+  await ready(page, '/#/library');
+  await expect(page.getByTestId('reel-card')).toHaveCount(1);
+  await expect(page.getByTestId('reel-card').first()).toContainText('Recipes');
+  expect(await page.evaluate(() => document.documentElement.dataset.theme || globalThis.__reels.store.state.settings?.theme)).toBe('dark');
+  const names = await page.evaluate(async () => (await indexedDB.databases()).map((d) => d.name).sort());
+  expect(names).toEqual(['stash']);
 });

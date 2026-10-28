@@ -1,4 +1,4 @@
-package io.github.firatnexus.reelsorganizer;
+package io.github.firatnexus.stash;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -37,9 +37,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Small native bridge for Stash (Reels Organizer).
+ * Small native bridge for Stash.
  *
- * - Receives text shared from other apps (Instagram "Share" -> Reels Organizer).
+ * - Receives text shared from other apps (Instagram "Share" -> Save to Stash).
  * - Opens links with ACTION_VIEW so instagram.com links go to the Instagram app.
  * - Saves backup files through the system "Save as" dialog (Storage Access Framework).
  * - Reads the clipboard and colors the system bars.
@@ -143,7 +143,7 @@ public class ReelsBridgePlugin extends Plugin {
 
     @PluginMethod
     public void saveTextFile(PluginCall call) {
-        String name = call.getString("name", "reels-organizer-backup.json");
+        String name = call.getString("name", "stash-backup.json");
         String mime = call.getString("mime", "application/json");
         pendingSaveText = call.getString("text", "");
         Intent i = new Intent(Intent.ACTION_CREATE_DOCUMENT);

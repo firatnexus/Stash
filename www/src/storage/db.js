@@ -3,8 +3,16 @@
  * All application data lives on the device in this database.
  */
 
-export const DB_NAME = 'reels-organizer';
+export const DB_NAME = 'stash';
 export const DB_VERSION = 1;
+/**
+ * Database name used before 1.2.2 (when the app was called Reels Organizer).
+ * On first open its data is copied into DB_NAME and the old database is
+ * deleted only after the copy has committed, so a failed or interrupted
+ * migration simply runs again on the next launch.
+ */
+export const LEGACY_DB_NAMES = ['reels-organizer'];
+const STORES = ['reels', 'categories', 'settings'];
 
 let dbPromise = null;
 
@@ -40,7 +48,10 @@ export function openDb(name = DB_NAME) {
     req.onsuccess = () => {
       const db = req.result;
       db.onversionchange = () => db.close();
-      resolve(db);
+      const legacy = name === DB_NAME ? LEGACY_DB_NAMES : [];
+      migrateLegacy(factory, db, legacy)
+        .catch((e) => console.warn('Legacy database migration failed; will retry on next launch', e))
+        .then(() => resolve(db));
     };
     req.onerror = () => reject(req.error);
     req.onblocked = () => reject(new Error('Database upgrade blocked by another open tab'));
@@ -49,6 +60,104 @@ export function openDb(name = DB_NAME) {
     dbPromise = null;
   });
   return dbPromise;
+}
+
+/**
+ * Opens an existing database by name, or resolves null when it does not exist
+ * (the implicit creation is aborted so no empty database is left behind).
+ */
+function openExisting(factory, name) {
+  return new Promise((resolve) => {
+    let missing = false;
+    let r;
+    try {
+      r = factory.open(name);
+    } catch {
+      resolve(null);
+      return;
+    }
+    r.onupgradeneeded = (ev) => {
+      if (ev.oldVersion === 0) {
+        missing = true;
+        r.transaction.abort();
+      }
+    };
+    r.onsuccess = () => {
+      if (missing) {
+        r.result.close();
+        resolve(null);
+      } else resolve(r.result);
+    };
+    r.onerror = (ev) => {
+      ev.preventDefault?.();
+      resolve(null);
+    };
+    r.onblocked = () => resolve(null);
+  });
+}
+
+function readAll(db, store) {
+  return new Promise((resolve, reject) => {
+    if (!db.objectStoreNames.contains(store)) {
+      resolve([]);
+      return;
+    }
+    const q = db.transaction([store], 'readonly').objectStore(store).getAll();
+    q.onsuccess = () => resolve(q.result || []);
+    q.onerror = () => reject(q.error);
+  });
+}
+
+/** Copy every legacy database into `db`, then delete the legacy one. */
+async function migrateLegacy(factory, db, names) {
+  for (const legacyName of names) {
+    const old = await openExisting(factory, legacyName);
+    if (!old) continue;
+    let data;
+    try {
+      data = Object.fromEntries(await Promise.all(STORES.map(async (s) => [s, await readAll(old, s)])));
+    } finally {
+      old.close();
+    }
+    await new Promise((resolve, reject) => {
+      const t = db.transaction(STORES, 'readwrite');
+      const reels = t.objectStore('reels');
+      for (const r of data.reels) {
+        // Never overwrite something already in the new database; skip a reel
+        // whose link was saved again after an earlier, interrupted migration.
+        const byId = reels.get(r.id);
+        byId.onsuccess = () => {
+          if (byId.result) return;
+          const byKey = reels.index('key').get(r.key);
+          byKey.onsuccess = () => {
+            if (!byKey.result) reels.add(r);
+          };
+        };
+      }
+      for (const c of data.categories) {
+        const cats = t.objectStore('categories');
+        const g = cats.get(c.id);
+        g.onsuccess = () => {
+          if (!g.result) cats.add(c);
+        };
+      }
+      for (const st of data.settings) {
+        const settings = t.objectStore('settings');
+        const g = settings.get(st.key);
+        g.onsuccess = () => {
+          if (!g.result) settings.add(st);
+        };
+      }
+      t.oncomplete = resolve;
+      t.onerror = () => reject(t.error);
+      t.onabort = () => reject(t.error || new Error('Migration aborted'));
+    });
+    // Only now that the copy is committed is the old database removed.
+    await new Promise((resolve) => {
+      const d = factory.deleteDatabase(legacyName);
+      d.onsuccess = d.onerror = d.onblocked = () => resolve();
+    });
+  }
 }
 
 /** Close and forget the connection (used by tests and full reset). */

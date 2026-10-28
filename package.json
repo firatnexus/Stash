@@ -1,6 +1,6 @@
 {
   "name": "stash",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "private": true,
   "description": "Local-first Android app to organize saved Instagram Reels into your own categories.",
   "license": "MIT",

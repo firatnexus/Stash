@@ -14,7 +14,7 @@ def signValue = { String env, String prop -> System.getenv(env) ?: ksProps.getPr
 def releaseStore = signValue('RO_KEYSTORE_FILE', 'storeFile')
 
 android {
-    namespace "io.github.firatnexus.reelsorganizer"
+    namespace "io.github.firatnexus.stash"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "io.github.firatnexus.reelsorganizer"

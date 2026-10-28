@@ -11,6 +11,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <!--
+            Java classes live in io.github.firatnexus.stash. The launcher icon and
+            the share target keep the component name used before 1.2.2
+            (io.github.firatnexus.reelsorganizer.MainActivity) through the alias
+            below, so home-screen shortcuts and pinned share targets survive the
+            update. The applicationId is unchanged as well; never rename it, or
+            Android treats Stash as a different app and the data is lost.
+        -->
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation"
             android:name=".MainActivity"
@@ -18,6 +26,12 @@
             android:theme="@style/AppTheme.NoActionBarLaunch"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize"
+            android:exported="true" />
+
+        <activity-alias
+            android:name="io.github.firatnexus.reelsorganizer.MainActivity"
+            android:targetActivity=".MainActivity"
+            android:label="@string/title_activity_main"
             android:exported="true">
 
             <intent-filter>
@@ -25,14 +39,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Appear in the Android share sheet for shared text/links (Instagram "Share" -> Reels Organizer) -->
+            <!-- Appear in the Android share sheet for shared text/links (Instagram "Share" -> Save to Stash) -->
             <intent-filter android:label="@string/share_label">
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
             </intent-filter>
 
-        </activity>
+        </activity-alias>
 
         <provider
             android:name="androidx.core.content.FileProvider"

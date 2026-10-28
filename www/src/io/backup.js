@@ -6,7 +6,9 @@ import { shapeReel, shapeCategory } from '../storage/repo.js';
 import { parseInstagramUrl } from '../instagram/url.js';
 import { fold } from '../categorize/normalize.js';
 
-export const BACKUP_APP = 'reels-organizer';
+export const BACKUP_APP = 'stash';
+/** Backups written before 1.2.2 (Reels Organizer) are still accepted. */
+export const LEGACY_BACKUP_APPS = ['reels-organizer'];
 export const BACKUP_SCHEMA = 1;
 
 export class BackupError extends Error {
@@ -33,13 +35,13 @@ export function buildBackup({ reels, categories, settings, version }) {
 
 export function backupFileName(date = new Date()) {
   const p = (n) => String(n).padStart(2, '0');
-  return `reels-organizer-backup-${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())}.json`;
+  return `stash-backup-${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())}.json`;
 }
 
 /** Validate and normalise a parsed backup. Throws BackupError. */
 export function validateBackup(data) {
   if (!data || typeof data !== 'object') throw new BackupError('invalid');
-  if (data.app !== BACKUP_APP) throw new BackupError('wrong_app');
+  if (data.app !== BACKUP_APP && !LEGACY_BACKUP_APPS.includes(data.app)) throw new BackupError('wrong_app');
   if (!Number.isInteger(data.schemaVersion) || data.schemaVersion > BACKUP_SCHEMA) throw new BackupError('newer_schema');
   if (!Array.isArray(data.reels) || !Array.isArray(data.categories)) throw new BackupError('invalid');
 
