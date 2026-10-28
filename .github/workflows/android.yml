@@ -71,10 +71,18 @@ jobs:
           name: stash-apk
           path: dist/
 
-      - name: Attach to GitHub release
+      - name: Render release notes (this version only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: node scripts/release-notes.mjs "${{ steps.apk.outputs.version }}" dist "$GITHUB_REPOSITORY" > "$RUNNER_TEMP/release-body.md"
+
+      - name: Create or update the GitHub release
         if: startsWith(github.ref, 'refs/tags/v')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || gh release create "$GITHUB_REF_NAME" --title "Stash $GITHUB_REF_NAME" --notes "See CHANGELOG.md"
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release edit "$GITHUB_REF_NAME" --title "Stash $GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/release-body.md"
+          else
+            gh release create "$GITHUB_REF_NAME" --title "Stash $GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/release-body.md" --latest
+          fi
           gh release upload "$GITHUB_REF_NAME" dist/* --clobber

@@ -1,60 +1,76 @@
-# Değişiklik günlüğü
+# Changelog
+
+All notable changes to Stash. Newest first. Each `## X.Y.Z — date` section is published as the GitHub release notes for that version only.
+
+## 1.2.1 — 2026-10-28
+
+A small polish release with an all-English repository.
+
+### Fixed
+
+- **Hidden WebView scrollbar:** the Android WebView no longer draws its vertical scrollbar overlay on the right edge while you scroll long lists.
+
+### Changed
+
+- **English documentation:** the README, changelog and release notes are now fully in English, with a redesigned README and fresh screenshots taken with the English UI.
+- **Per-version release notes:** every GitHub release now shows only the notes for its own version, plus download details (size and SHA-256), install steps, highlights, permissions and known limitations.
+- **Repository renamed** from `reels-organizer` to `Stash`; old links redirect automatically.
 
 ## 1.2.0 — 2026-10-25
 
-ElevenLabs esintili editoryal tasarım yenilemesi (marka vurgusu yok; işlevsellik ve veri modeli değişmedi).
+An editorial design refresh. No functional or data-model changes.
 
-### Değişen
+### Changed
 
-- **Tipografi:** Satoshi/Cabinet Grotesk yerine EB Garamond (display, ağırlık 400) + Inter (gövde) değişken fontlar; latin + latin-ext alt kümeleri (tam Türkçe ĞğİıŞşÇçÖöÜü kapsamı), OFL 1.1 lisans notları `www/fonts/` içinde. Başlıklar serif, negatif harf aralığı, gövdede hafif pozitif izleme. Waldenburg lisanslı olduğundan belgelendiği açık kaynak alternatifi kullanıldı.
-- **Renk:** kâğıt tonu + tek ahududu vurgusu yerine ElevenLabs paleti — kırık beyaz tuval (#f5f5f5), sıcak mürekkep siyahı (#292524 / #0c0a09), tekincil eylem rengi yok; doygun CTA rengi kaldırıldı.
-- **Butonlar:** yuvarlatılmış dikdörtgen + degrade dolgular yerine tam pill geometri; birincil = mürekkep dolgulu pill, ikincil = 1px kontur.
-- **Kartlar:** daha yumuşak köşeler (16px kart, 24px orb kartı), 1px saç çizgisi kenarlıkları ve tek katman yumuşak gölge.
-- **Atmosferik orb'lar:** başlık alanının arkasında ve hızlı ekleme bandında yumuşak pastel radyal gradyanlar (nane/şeftali/lavanta/gökyüzü) — yalnızca dekorasyon.
-- **Kategori renkleri:** canlı renk seti yerine yumuşatılmış pastel palet; kapak düşen kartlarda beyaz yerine mürekkep baş harf.
-- **Koyu tema:** ElevenLabs koyu yüzeyleri (#0c0a09 / #1c1917) ile yeniden denge; koyu temada pill ters çevrilir (açık dolgu, koyu metin) — seçim onay işareti, anahtar topu ve Sil düğmesi metni de temaya göre düzeltildi.
-- **Uygulama simgesi ve açılış ekranı:** kırık beyaz zemin üzerinde mürekkep yer imi + pastel orb'lar; tüm mipmap/splash varlıkları yeniden üretildi.
-- **Kitaplık araç çubuğu:** telefonda arama alanı artık kendi satırında (önceki dar paylaşılan satıra göre kullanılabilirlik düzeltmesi).
+- **Typography:** EB Garamond (display, weight 400) and Inter (body) variable fonts replace Satoshi / Cabinet Grotesk. Latin and Latin Extended subsets give full Turkish coverage (ĞğİıŞşÇçÖöÜü); OFL 1.1 license notes live in `www/fonts/`. Serif headings with tight letter spacing, slightly open tracking in body text.
+- **Color:** a soft off-white canvas (#f5f5f5) and warm ink black (#292524 / #0c0a09) replace the paper tone and single raspberry accent. There is no saturated call-to-action color any more.
+- **Buttons:** full pill geometry instead of rounded rectangles with gradient fills. Primary is an ink-filled pill, secondary a 1px outline.
+- **Cards:** softer corners (16px cards, 24px orb card), 1px hairline borders and a single soft shadow layer.
+- **Atmospheric orbs:** soft pastel radial gradients (mint, peach, lavender, sky) behind the header and the quick-add band, purely decorative.
+- **Category colors:** a muted pastel palette instead of the vivid set; cards without a cover show an ink initial instead of a white one.
+- **Dark theme:** rebalanced around deep surfaces (#0c0a09 / #1c1917). Pills invert in dark mode (light fill, dark text); the selection check, switch knob and Delete button text follow the theme.
+- **App icon and splash screen:** an ink bookmark with pastel orbs on an off-white background; all mipmap and splash assets regenerated.
+- **Library toolbar:** on phones the search field now has its own row instead of sharing a cramped one.
+
+## 1.1.1 — 2026-10-22
+
+Renamed to **Stash** (it was Sakla in 1.1.0, originally Reels Organizer). All app-name strings, the share-target label and the release page are in English. The `applicationId` is unchanged, so it installs over existing versions.
+
+## 1.1.0 — 2026-10-22
+
+Renamed to **Sakla** (formerly Reels Organizer). The `applicationId` is unchanged, so it installs over existing versions.
+
+### Added
+
+- **Native splash screen:** androidx SplashScreen API with a 450ms scale animation. It stays until the first frame is drawn, so there is no white flash (Android 7 to 11 included).
+- **Cover images and creator info:** fetched at save time from Instagram's public embed page and stored on the device as WebP (480px max). Includes a "Refresh cover" retry, a one-time "Update existing reels" backfill, and cache size and clearing in Settings. This route is used because Meta removed `thumbnail_url` from oEmbed.
+- **Broader AI suggestions:** 1 to 3 existing categories, at most 1 new category and 3 to 5 tags. Tags are never applied automatically (there is a "Reject all"). Settings explains what is sent, and suggestions can be turned off.
+- **Tags:** add them manually, filter by tag chips in the Library and search by tag.
+- **Home / Library split:** Home is a summary dashboard (quick add, stats, "Take another look today", reels waiting for a category). The Library holds the full collection (search, sort, category and tag filters, list or grid, multi-select bulk categorize and delete).
+- **Drag to dismiss sheets:** drag down from the handle or header; the sheet closes past a 30% threshold or on a quick fling, otherwise it springs back.
+- **Tactile feel:** tonal fills with a soft shadow, a 0.96 press scale, 120 to 180ms transitions and native haptics.
+- **Clipboard offer:** when the app comes to the foreground with an unsaved Instagram link on the clipboard, it offers to add it. Nothing is added until you tap.
+
+### Fixed
+
+- "Refresh cover" and "Load Instagram preview" overlapping on the detail sheet.
+- Scroll performance: removed fixed blurred bars (`backdrop-filter`), a known cause of scroll jank in Android WebView.
+
+### Known limitations
+
+- Cover download works only for public Reels with a real shortcode; private or removed content gets no cover.
+- Performance was measured in desktop Chromium (the main thread stays vsync-bound while scrolling); no physical-device measurement yet.
 
 ## 1.0.0 — 2026-10-22
 
-İlk sürüm.
+First release.
 
-- Instagram'dan Android paylaşım menüsüyle Reel kaydetme (soğuk ve sıcak başlatma).
-- Tekli / toplu bağlantı ekleme, panodan yapıştırma, ayrıntılı bağlantı hataları.
-- Instagram veri dışa aktarımından (ZIP / JSON / HTML) toplu içe aktarma; koleksiyonları kategoriye çevirme, Meta mojibake düzeltmesi.
-- Kategori oluşturma, yeniden adlandırma, renk, anahtar kelimeler, silme; TR/EN hazır öneriler.
-- Anahtar kelime + hashtag + koleksiyon + paylaşan geçmişi ile kategori seçimi; emin değilse kullanıcıya sorma.
-- İsteğe bağlı yapay zekâ sağlayıcısı (OpenAI, Gemini, OpenRouter, Anthropic, OpenAI uyumlu özel uç nokta).
-- Arama, kategori filtreleri, en yeni / en eski sıralama, kopya algılama.
-- JSON yedek dışa aktarma ve birleştirerek / değiştirerek geri yükleme.
-- Türkçe / İngilizce arayüz, açık / koyu tema, Android geri tuşu, uyarlanabilir ve tematik uygulama simgesi.
-
-## 1.1.1 — 2026-10-22 (Stash)
-
-Renamed to **Stash** (English name; was Sakla in 1.1.0, formerly Reels Organizer). All app-name strings, the share-target label and the release page are now in English. `applicationId` unchanged — installs over existing versions.
-
-## 1.1.0 — 2026-10-22 (Sakla)
-
-Yeni ad: **Sakla** (eski adı Reels Organizer). `applicationId` değişmedi — mevcut kurulumların üzerine yüklenebilir.
-
-### Eklenen
-
-- **Native açılış ekranı:** androidx SplashScreen API ile crimson/cream marka, 450ms ölçek animasyonu; ilk kare çizilene kadar kalır, beyaz parlama yok (Android 7-11 dahil).
-- **Kapak resimleri ve paylaşan bilgisi:** kayıt sırasında Instagram'ın herkese açık embed sayfasından çekilir, ≤480px WebP olarak cihazda saklanır. "Kapak yenile" yeniden deneme, tek seferlik "Mevcut reelleri güncelle", Ayarlar'da önbellek boyutu ve temizleme. Meta oEmbed'ten `thumbnail_url`'i kaldırdığı için bu yol kullanılır.
-- **AI önerileri genişletildi:** 1-3 mevcut kategori + en fazla 1 yeni kategori + 3-5 etiket önerisi. Etiketler asla otomatik uygulanmaz ("Hepsini reddet" var). Ayarlar'da ne gönderildiği yazar; öneriler kapatılabilir.
-- **Etiketler:** elle ekleme, Kitaplık'ta etiket filtre çipleri ve arama.
-- **Ana sayfa / Kitaplık ayrımı:** Ana sayfa özet panosu (hızlı ekleme, istatistik, "Bugün tekrar bak", kategori bekleyenler); Kitaplık tam koleksiyon (arama, sıralama, kategori/etiket filtreleri, liste/ızgara, çoklu seçimle toplu kategorileme/silme).
-- **Alt sayfalarda sürükle-kapat:** tutamak/başlıktan aşağı sürükleme — %30 eşiği veya hızlı savuruşta kapanır, yoksa geri yaylanır.
-- **Dokunma hissi:** tonal dolgu + yumuşak gölge, 0.96 ölçekli basınç efekti, 120-180ms geçişler, native haptic.
-- **Pano önerisi:** uygulama ön plana geldiğinde panodaki kaydedilmemiş Instagram bağlantısı için net istem; kullanıcı dokunmadan hiçbir şey eklenmez.
-
-### Düzeltmeler
-
-- Ayrıntı sayfasında "Kapak yenile" ve "Instagram önizlemesini yükle" düğmelerinin üst üste binmesi.
-- Kaydırma performansı: sabit bulanık çubukların (backdrop-filter) kaldırılması — Android WebView'da kaydırma takılmasının bilinen sebebi.
-
-### Bilinen sınırlar
-
-- Kapak indirme yalnızca gerçek shortcode'lu herkese açık Reels'larda çalışır; gizli/kaldırılmış içerikte gelmez.
-- Performans ölçümü masaüstü Chromium'da yapıldı (ana thread kaydırmada vsync'e bağlı); gerçek cihaz ölçümü yapılmadı.
+- Save Reels from Instagram through the Android share sheet (cold and warm start).
+- Add single or multiple links, paste from the clipboard, detailed link errors.
+- Bulk import from Instagram's data export (ZIP / JSON / HTML); collections become categories; Meta mojibake is repaired.
+- Create, rename, color, add keywords to and delete categories; Turkish and English starter suggestions.
+- Category matching from keywords, hashtags, collections and creator history; the app asks you when it is not sure.
+- Optional AI provider (OpenAI, Gemini, OpenRouter, Anthropic or a custom OpenAI-compatible endpoint).
+- Search, category filters, newest / oldest sorting, duplicate detection.
+- JSON backup export, restore by merging or replacing.
+- Turkish and English UI, light and dark theme, Android back button, adaptive and themed app icon.
