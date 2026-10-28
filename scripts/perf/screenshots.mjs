@@ -32,19 +32,28 @@ const server = createServer(async (req, res) => {
 });
 await new Promise((r) => server.listen(8792, r));
 
-const cats = [
+// UI language and demo data of the shots: LANG_UI=tr for Turkish (default: en).
+const LANG = process.env.LANG_UI === 'tr' ? 'tr' : 'en';
+const CATS_TR = [
   { id: 'c1', name: 'Tarifler', color: 'coral', keywords: ['tarif', 'yemek'], order: 1, createdAt: 1, updatedAt: 1 },
   { id: 'c2', name: 'Seyahat', color: 'teal', keywords: ['seyahat'], order: 2, createdAt: 1, updatedAt: 1 },
   { id: 'c3', name: 'Eğitim', color: 'blue', keywords: ['ders'], order: 3, createdAt: 1, updatedAt: 1 },
   { id: 'c4', name: 'Kediler', color: 'amber', keywords: ['kedi'], order: 4, createdAt: 1, updatedAt: 1 },
 ];
+const CATS_EN = [
+  { id: 'c1', name: 'Recipes', color: 'coral', keywords: ['recipe', 'dinner'], order: 1, createdAt: 1, updatedAt: 1 },
+  { id: 'c2', name: 'Travel', color: 'teal', keywords: ['travel'], order: 2, createdAt: 1, updatedAt: 1 },
+  { id: 'c3', name: 'Learning', color: 'blue', keywords: ['lesson'], order: 3, createdAt: 1, updatedAt: 1 },
+  { id: 'c4', name: 'Cats', color: 'amber', keywords: ['cat'], order: 4, createdAt: 1, updatedAt: 1 },
+];
+const cats = LANG === 'tr' ? CATS_TR : CATS_EN;
 const HUES = [8, 24, 190, 200, 160, 280, 330, 40];
 const coverDataUrl = (i) => {
   const hue = HUES[i % HUES.length];
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="360"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(${hue},60%,55%)"/><stop offset="1" stop-color="hsl(${(hue + 40) % 360},55%,35%)"/></linearGradient></defs><rect width="240" height="360" fill="url(#g)"/></svg>`;
   return 'data:image/svg+xml,' + encodeURIComponent(svg);
 };
-const reels = [
+const REELS_TR = [
   { u: 'mutfakvekitap', c: 'Ev yapımı makarna tarifi 🍝 adım adım anlatım', cat: 'c1', tags: ['pratik', 'akşamyemeği'], d: 2 },
   { u: 'gezgin.ruya', c: 'Kapadokya\'da gün batımı yürüyüşü', cat: 'c2', tags: ['seyahat', 'doğa'], d: 5 },
   { u: 'derscalisiyorum', c: 'Fizik özet: tork ve açısal momentum', cat: 'c3', tags: ['özet'], d: 7 },
@@ -56,6 +65,19 @@ const reels = [
   // uncategorized with AI suggestions — drives the pick-sheet screenshot
   { u: 'fotografgunlugu', c: 'Golden hour fotoğrafçılığı için 7 ipucu', cat: null, tags: [], d: 1, pending: true, sug: ['pratik', 'ışık', 'fotoğraf'] },
 ];
+const REELS_EN = [
+  { u: 'kitchen.and.books', c: 'Homemade pasta recipe 🍝 step by step', cat: 'c1', tags: ['quick', 'dinner'], d: 2 },
+  { u: 'wander.ruya', c: 'Sunset walk in Cappadocia', cat: 'c2', tags: ['travel', 'nature'], d: 5 },
+  { u: 'study.notes', c: 'Physics recap: torque and angular momentum', cat: 'c3', tags: ['recap'], d: 7 },
+  { u: 'my.cat.and.me', c: 'My cat\'s morning routine 😹', cat: 'c4', tags: ['cat', 'funny'], d: 1 },
+  { u: 'kitchen.and.books', c: 'Oven-baked chicken with vegetables, an easy dinner', cat: 'c1', tags: ['quick'], d: 12 },
+  { u: 'wander.ruya', c: 'Camping in the Black Sea highlands', cat: 'c2', tags: ['camping'], d: 20 },
+  { u: 'study.notes', c: '5 tips for practising spoken English', cat: 'c3', tags: ['english'], d: 30 },
+  { u: 'my.cat.and.me', c: 'House rules for feeding street cats', cat: 'c4', tags: ['cat'], d: 45 },
+  // uncategorized with AI suggestions — drives the pick-sheet screenshot
+  { u: 'photo.diary', c: '7 tips for golden hour photography', cat: null, tags: [], d: 1, pending: true, sug: ['tips', 'light', 'photography'] },
+];
+const reels = LANG === 'tr' ? REELS_TR : REELS_EN;
 const data = reels.map((r, i) => ({
   id: 'r' + i,
   key: 'Shot' + i + 'Xyz',
@@ -94,7 +116,7 @@ const phone = await browser.newPage({ viewport: { width: 390, height: 844 }, isM
 async function seedAndGo(hash, theme = 'light') {
   await phone.goto('http://127.0.0.1:8792/index.html#/home');
   await phone.evaluate(
-    ({ cats, data, theme }) =>
+    ({ cats, data, theme, lang }) =>
       new Promise((resolve, reject) => {
         const req = indexedDB.open('reels-organizer', 1);
         req.onupgradeneeded = () => {
@@ -116,13 +138,13 @@ async function seedAndGo(hash, theme = 'light') {
           for (const c of cats) t.objectStore('categories').put(c);
           for (const r of data) t.objectStore('reels').put(r);
           t.objectStore('settings').put({ key: 'theme', value: theme });
-          t.objectStore('settings').put({ key: 'lang', value: 'tr' });
+          t.objectStore('settings').put({ key: 'lang', value: lang });
           t.oncomplete = () => { db.close(); resolve(); };
           t.onerror = () => reject(t.error);
         };
         req.onerror = () => reject(req.error);
       }),
-    { cats, data, theme },
+    { cats, data, theme, lang: LANG },
   );
   await phone.reload({ waitUntil: 'networkidle' });
   await phone.goto('http://127.0.0.1:8792/index.html#' + hash);
@@ -158,6 +180,13 @@ await shot('light-categories.png');
 await phone.goto('http://127.0.0.1:8792/index.html#/add');
 await phone.waitForTimeout(400);
 await shot('light-add.png');
+
+// dark home + library
+await seedAndGo('/home', 'dark');
+await shot('dark-home.png');
+await phone.goto('http://127.0.0.1:8792/index.html#/library');
+await phone.waitForTimeout(500);
+await shot('dark-library.png');
 
 await browser.close();
 server.close();
