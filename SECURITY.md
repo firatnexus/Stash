@@ -24,7 +24,7 @@ Do not open a public issue for anything security-sensitive.
 
 Worth stating clearly, because much of the app's security is structural:
 
-- **All data stays on the device** in IndexedDB. There is no backend to breach — the attack surface is the app itself.
+- **Your library stays on the device** in IndexedDB. Stash has no project-operated backend — the attack surface is the app itself.
 - **Network use is narrow and documented**: the cover/creator fetch (`instagram.com/reel/…/embed`) at save time, opening a Reel in Instagram, the optional embedded preview, and — only if you turn it on — the AI provider you configure. Nothing else makes requests.
 - **The AI API key** is stored only on the device and is never written to backups or exports.
 - **Android cloud backup and device-to-device transfer are disabled** (`allowBackup=false`), so your library is not silently copied to Google services.

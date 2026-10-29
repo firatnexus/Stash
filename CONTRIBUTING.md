@@ -31,7 +31,7 @@ These are the project's core guarantees. PRs that break them will not be merged:
 - **No new permissions.** Only `INTERNET` and `VIBRATE` are declared, and no runtime permissions are requested.
 - **Privacy claims are code.** The README's privacy section must match what the code does — if your change affects data flow, update the README too.
 - **No build step in `www/`.** Plain ES modules, hand-written HTML/CSS/JS. Do not introduce bundlers or transpilers.
-- **Both themes, both viewports.** Light and dark theme, phone and desktop — the e2e suite covers both, and your change should look right in all four combinations.
+- **Both themes, both viewports.** The e2e suite runs on phone and desktop viewports and exercises the dark theme; check your change in light theme by hand.
 - **Secrets never in code, logs, backups or screenshots.** This includes AI API keys.
 
 ## Pull requests
