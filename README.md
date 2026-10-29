@@ -99,7 +99,7 @@ Instagram's own "Saved" tab is one long, unsorted list. Stash gives every Reel y
 > [!TIP]
 > Updates are signed with the same key, so a new APK installs over the old one and keeps your data.
 
-Because Stash is not on the Play Store, Play Protect may show an "unrecognized app" warning. The app requests no runtime permissions; only `INTERNET` is declared (for opening Reels in Instagram, the optional preview and the optional AI).
+Because Stash is not on the Play Store, Play Protect may show an "unrecognized app" warning. The app requests no runtime permissions; only `INTERNET` (for opening Reels in Instagram, the optional preview and the optional AI) and `VIBRATE` (for button-press haptics) are declared.
 
 ## How it works
 
